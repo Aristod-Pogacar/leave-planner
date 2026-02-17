@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <meta name="author" content="theme_ocean">
+    <!--! The above 6 meta tags *must* come first in the head; any other head content must come *after* these tags !-->
+    <!--! BEGIN: Apps Title-->
+    <title>New Leave</title>
+    <!--! END:  Apps Title-->
+    <!--! BEGIN: Favicon-->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico">
+    <!--! END: Favicon-->
+    <!--! BEGIN: Bootstrap CSS-->
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css">
+    <!--! END: Bootstrap CSS-->
+    <!--! BEGIN: Vendors CSS-->
+    <link rel="stylesheet" type="text/css" href="/assets/vendors/css/vendors.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendors/css/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendors/css/select2-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendors/css/datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendors/css/quill.min.css">
+    <!--! END: Vendors CSS-->
+    <!--! BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="/assets/css/theme.min.css">
+    <!--! END: Custom CSS-->
+    <!--! HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries !-->
+    <!--! WARNING: Respond.js doesn"t work if you view the page via file: !-->
+    <!--[if lt IE 9]>
+			<script src="https:oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https:oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+    <h1 class="page-title">Créer une nouvelle demande de congé</h1>
+    <form action="/leave/new-leave" method="POST">
+        <div>
+            <label for="employeeId">Employé :</label>
+            <div class="control has-icons-left">
+                <input class="input" type="text" id="employeeSearch" placeholder="Search employee (matricule or name)"
+                    autocomplete="off" />
+                <span class="icon left"><i class="mdi mdi-account"></i></span>
+                <input type="text" class="input" name="matricule" id="matricule" hidden required>
+                <ul id="employeeResults" class="autocomplete-list"></ul>
+            </div>
+        </div>
+
+        <div>
+            <label for="leave_type">Type de congé :</label>
+            <select name="leave_type" id="leave_type" required>
+                <option value="Local_Leave_AMD">Congés annuels</option>
+                <option value="Medical_Leave_AMD">Maladie</option>
+                <option value="Permission_AMD">Permission</option>
+                <option value="Indisponibilite_AMD">Indisponibilité</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="start_date">Date de début :</label>
+            <input type="date" name="start_date" id="start_date" required>
+        </div>
+
+        <div>
+            <label for="end_date">Date de fin :</label>
+            <input type="date" name="end_date" id="end_date" required>
+        </div>
+
+        <div>
+            <label for="reason">Raison :</label>
+            <textarea name="reason" id="reason" rows="4"></textarea>
+        </div>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+    <script>
+        const input = document.getElementById('employeeSearch');
+        const results = document.getElementById('employeeResults');
+        const hiddenInput = document.getElementById('matricule');
+        const submitButton = document.getElementById('submit');
+
+        let timeout = null;
+
+        input.addEventListener('input', () => {
+            clearTimeout(timeout);
+
+            const query = input.value.trim();
+            if (query.length < 2) {
+                results.innerHTML = '';
+                return;
+            }
+
+            timeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/employee/finding/search-list?q=${query}`);
+
+                    if (!res.ok) {
+                        console.error('HTTP error', res.status);
+                        return;
+                    }
+
+                    const data = await res.json();
+
+                    results.innerHTML = '';
+                    data.forEach(emp => {
+                        const li = document.createElement('li');
+                        li.textContent = `${emp.matricule} - ${emp.fullname}`;
+                        li.onclick = () => {
+                            input.value = li.textContent;
+                            hiddenInput.value = emp.matricule;
+                            results.innerHTML = '';
+                        };
+                        results.appendChild(li);
+                    });
+
+                } catch (err) {
+                    console.error('Autocomplete error:', err);
+                }
+            }, 300);
+        });
+    </script>
+</body>
+
+</html>
