@@ -6,7 +6,7 @@ export class Leave {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @ManyToOne(() => Employee)
+    @ManyToOne(() => Employee, employee => employee.leaves)
     @JoinColumn({ name: 'employee_id' })
     employee!: Employee;
 
@@ -33,4 +33,7 @@ export class Leave {
 
     @Column({ nullable: true })
     approver_id?: string;
+
+    @Column({ default: () => "CURRENT_TIMESTAMP" })
+    created_at?: Date;
 }

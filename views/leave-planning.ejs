@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Planning Congés</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .planning-container {
+            display: flex;
+            height: 75vh;
+            border: 1px solid #ddd;
+            background: white;
+        }
+
+        .employee-column {
+            width: 500px;
+            border-right: 2px solid #ccc;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .employee-cell {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            border-bottom: 1px solid #eee;
+            font-weight: 500;
+            /* margin-bottom: 10px; */
+        }
+
+        .header-cell {
+            height: 60px;
+            border-bottom: 2px solid #ccc;
+            background: #f8f9fa;
+            text-align: center;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            /* margin-bottom: 100px; */
+        }
+
+        .dates-container {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .dates-grid {
+            display: grid;
+            grid-auto-rows: 40px;
+            /* grid-auto-rows: 40px; */
+            min-width: 1500px;
+        }
+
+        .day-header {
+            height: 60px;
+            border: 1px solid #eee;
+            text-align: center;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f7f7f7;
+        }
+
+        .header-today {
+            background-color: #eefbff;
+        }
+
+        .day-cell {
+            border: 1px solid #f1f1f1;
+            top: 50%;
+            left: 50%;
+            transform: translate(0, 50%);
+            text-align: center;
+            align-items: center;
+            align-content: center;
+            padding-top: 5px;
+            padding-left: 5px;
+            padding-right: 5px;
+            text-wrap: inherit;
+            color: #eefbff;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .leave-bar-text {
+            white-space: nowrap;
+            /* pas de retour à la ligne */
+            overflow: hidden;
+            /* cache le surplus */
+            text-overflow: ellipsis;
+            /* affiche ... */
+        }
+
+        .today {
+            background-color: #eefbff;
+        }
+
+        .day-off {
+            background-color: #9d9d9d;
+            color: #ffffff;
+        }
+
+        .leave-Local_Leave_AMD {
+            background-color: #01057d;
+            border-radius: 5px;
+            cursor: pointer;
+            border-bottom: 7px solid #383eff;
+        }
+
+        .leave-Local_Leave_AMD:hover {
+            background-color: #0007ca;
+            border-radius: 5px;
+            cursor: pointer;
+            border-bottom: 7px solid #0088ff;
+        }
+
+        /* 
+        .leave-Medical_Leave_AMD {
+            background-color: #b00718;
+            border-radius: 5px;
+            cursor: pointer;
+            border-bottom: 7px solid #ff4759;
+        }
+
+        .leave-Medical_Leave_AMD:hover {
+            background-color: #e4091f;
+            border-radius: 5px;
+            border-bottom: 7px solid #ff5d6d;
+        } */
+
+        .leave-Indisponibilite_AMD {
+            background-color: #b00718;
+            border-radius: 5px;
+            cursor: pointer;
+            border-bottom: 7px solid #ff4759;
+        }
+
+        .leave-Indisponibilite_AMD:hover {
+            background-color: #e4091f;
+            border-radius: 5px;
+            border-bottom: 7px solid #ff5d6d;
+        }
+
+        .leave-Permission_AMD {
+            background-color: #0c5206;
+            border-radius: 5px;
+            cursor: pointer;
+            border-bottom: 7px solid #0d9701;
+        }
+
+        .leave-Permission_AMD:hover {
+            background-color: #108e05;
+            border-radius: 5px;
+            border-bottom: 7px solid #15ff00;
+        }
+
+        .employee-row {
+            display: grid;
+            grid-template-columns: 300px 100px 100px 100px;
+            align-items: center;
+        }
+
+        .employee-cell,
+        .header-cell {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header-row {
+            font-weight: bold;
+            background: #f5f5f5;
+        }
+
+        .text-center {
+            text-align: center;
+            justify-content: center;
+            justify-items: center;
+        }
+
+        .autocomplete-list {
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            position: absolute;
+            width: max-content;
+            /* width: 95%; */
+            z-index: 1000;
+        }
+
+        .autocomplete-list li {
+            padding: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .autocomplete-list li:hover {
+            background: #f0f0f0;
+        }
+
+        .autocomplete-list-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .autocomplete-list-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid mt-4">
+
+        <h4 class="mb-3">Planning des congés</h4>
+        <div class="row mb-3">
+            <div class="col-md-3 mt-2">
+                <select class="form-select" id="lineFilter">
+                    <!-- <option value="">Toutes les lignes</option> -->
+                    <% lineList.forEach(line=> { %>
+                        <option value="<%= line %>">
+                            <%= line %>
+                        </option>
+                        <% }) %>
+                </select>
+            </div>
+            <div class="col-md-3 mt-2">
+                <select class="form-select" id="departementFilter">
+                    <!-- <option value="">Toutes les divisions</option> -->
+                    <% departementList.forEach(function(departement) { %>
+                        <option value="<%= departement %>">
+                            <%= departement %>
+                        </option>
+                        <% }); %>
+                </select>
+            </div>
+            <div class="col-md-3 mt-2">
+                <!-- <button class="btn btn-primary" onclick="loadPlanning()">Charger</button> -->
+            </div>
+            <div class="col-md-3 mt-2 justify-content-end text-end">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#leaveModal">
+                    Planifier un congé
+                </button>
+            </div>
+        </div>
+        <!-- <div class="modal modal-lg fade" id="leaveModals" tabindex="-1" aria-labelledby="leaveModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="leaveModalLabel">Planifier un congé</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="/leave/new-leave" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="employee" class="form-label">Employé</label>
+                                <input class="form-control" type=" text" id="employeeSearch"
+                                    placeholder="Search employee (matricule or name)" autocomplete="off" />
+                                <span class="icon left"><i class="mdi mdi-account"></i></span>
+                                <input type="text" class="input" name="employee" id="employee" hidden required>
+                                <ul id="employeeResults" class="autocomplete-list ms-1 ps-0 w-full"></ul>
+                            </div>
+                            <div class="mb-3">
+                                <label for="leave_type" class="form-label">Type de congé</label>
+                                <select name="leave_type" id="leave_type" class="form-select">
+                                    <option value="Local_Leave_AMD">Congés annuels</option>
+                                    <option value="Permission_AMD">Permission</option>
+                                    <option value="Indisponibilite_AMD">Indisponibilité</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="start_date" class="form-label">Date de début</label>
+                                        <input type="date" class="form-control" id="start_date" name="start_date"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="end_date" class="form-label">Date de fin</label>
+                                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Raison</label>
+                                <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div> -->
+        <!-- Modal Planifier Congé -->
+        <div class="modal fade" id="leaveModal" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Planifier un congé</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+
+                            <!-- ===== LEFT: FORM ===== -->
+                            <div class="col-md-6 border-end">
+                                <form id="leaveForm">
+
+                                    <!-- Recherche Employé -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Employé</label>
+                                        <input type="text" class="form-control" id="employeeSearch" autocomplete="off"
+                                            placeholder="Rechercher un employé...">
+                                        <input type="text" class="input" name="employee" id="employee" hidden required>
+                                        <ul id="employeeResults" class="autocomplete-list ms-1 ps-0"></ul>
+                                    </div>
+
+                                    <!-- ID caché -->
+                                    <!-- <input type="hidden" required name="employee" id="employee"> -->
+
+                                    <!-- Type -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Type de congé</label>
+                                        <select class="form-select" name="type">
+                                            <option value="annuel" selected>Congés annuel</option>
+                                            <option value="permission">Permission</option>
+                                            <option value="indisponibilite">Indisponibilité</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Date début -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Date début</label>
+                                        <input type="date" class="form-control" name="startDate" id="startDate">
+                                    </div>
+
+                                    <!-- Date fin -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Date fin</label>
+                                        <input type="date" class="form-control" name="endDate" id="endDate">
+                                    </div>
+
+                                    <!-- Raison -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Raison (facultatif)</label>
+                                        <textarea class="form-control" name="reason" rows="3"></textarea>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <!-- ===== RIGHT: INFOS ===== -->
+                            <div class="col-md-6">
+                                <h6 class="mb-4">Informations employé</h6>
+
+                                <div class="card mb-3 shadow-sm">
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                            <strong>Solde cumulés :</strong>
+                                            <span id="soldeCumule">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Solde pris :</strong>
+                                            <span id="soldePris">-</span>
+                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Solde restant :</strong>
+                                            <span id="soldeRestant" class="fw-bold text-primary">-</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Annuler
+                        </button>
+                        <button type="submit" form="leaveForm" class="btn btn-primary">
+                            Enregistrer
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="planning-container">
+
+            <div id="employeeColumn" class="employee-column"></div>
+
+            <div id="datesContainer" class="dates-container">
+                <div id="datesGrid" class="dates-grid"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script>
+        const myModal = document.getElementById('leaveModal')
+        const myInput = document.getElementById('leaveModalButton')
+
+        myInput.addEventListener('shown.bs.modal', () => {
+            myModal.focus()
+        })
+
+    </script>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+        const isoDate = new Date().toISOString().split("T")[0];
+        console.log("ISO DATE:", isoDate);
+        const employeeColumn = document.getElementById("employeeColumn");
+        const datesContainer = document.getElementById("datesContainer");
+        const datesGrid = document.getElementById("datesGrid");
+
+        const query = new URLSearchParams(window.location.search);
+
+        const defaultLine = query.get("line") || "L1";
+        const defaultDepartement = query.get("departement") || "FINISHING";
+
+        let employees = [];
+        let leaves = [];
+
+        const year = 2026;
+        const startMonth = new Date().getMonth() + 1;
+        const endMonth = startMonth + 2;
+
+        const lineElement = document.getElementById("lineFilter");
+        const departementElement = document.getElementById("departementFilter");
+
+        lineElement.addEventListener("change", loadPlanning);
+        departementElement.addEventListener("change", loadPlanning);
+
+        let firstTime = true;
+
+        async function loadPlanning() {
+
+            var line = lineElement.value || defaultLine;
+            var departement = departementElement.value || defaultDepartement;
+
+            if (firstTime) {
+                line = defaultLine;
+                departement = defaultDepartement;
+                firstTime = false;
+                lineElement.value = defaultLine;
+                departementElement.value = defaultDepartement;
+            }
+
+            const year = 2026;
+            const startMonth = 1;
+            const endMonth = 3;
+            const skip = 0;
+            const take = 20;
+
+            const employeeUrl = `http://localhost:3000/employee/find-all?line=${line}&departement=${departement}&skip=${skip}&take=${take}`;
+            console.log("EMPLOYEE URL:", employeeUrl);
+
+            const res = await fetch(employeeUrl);
+
+            //   const res = await fetch(
+            //     `http://127.0.0.1:3000/planning?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&section=${section}&skip=0&take=50`
+            //   );
+
+            if (!res.ok) {
+                console.error("Erreur API");
+                return;
+            }
+
+            const data = await res.json();
+            console.log("DATA:", data);
+
+            employees = data.data;
+
+            const leaveUrl = `http://localhost:3000/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}`;
+            console.log("LEAVE URL:", leaveUrl);
+
+            const resLeave = await fetch(leaveUrl);
+
+            leaves = await resLeave.json();
+            console.log("leaves", leaves);
+
+            // leaves = data.leaves;
+
+            renderEmployees();
+            renderCalendar();
+        }
+
+        function renderEmployees() {
+
+            employeeColumn.innerHTML = "";
+
+            // Header
+            employeeColumn.innerHTML += `
+  <div class="employee-row header-row">
+    <div class="header-cell">EMPLOYEES</div>
+    <div class="header-cell">CUMULÉ</div>
+    <div class="header-cell">PRIS</div>
+    <div class="header-cell">RESTANT</div>
+  </div>
+`;
+
+            employees.forEach(emp => {
+
+                // Exemple de calcul (à adapter selon tes données)
+                const cumule = emp.solde_cumul || 0;
+                const prises = emp.solde_pris || 0;
+                const restant = emp.solde_restant || 0;
+
+                employeeColumn.innerHTML += `
+    <div class="employee-row">
+      <div class="employee-cell leave-bar-text">${emp.fullname}</div>
+      <div class="employee-cell text-center">${cumule}</div>
+      <div class="employee-cell text-center">${prises}</div>
+      <div class="employee-cell text-center">${restant}</div>
+    </div>
+  `;
+            });
+        }
+
+        function renderCalendar() {
+
+            datesGrid.innerHTML = "";
+
+            const days = generateDays();
+            datesGrid.style.gridTemplateColumns = `repeat(${days.length}, 40px)`;
+
+            days.forEach(day => {
+                const cell = document.createElement("div");
+                const toDay = new Date();
+                toDay.setHours(0);
+                toDay.setMinutes(0);
+                toDay.setSeconds(0);
+                toDay.setMilliseconds(0);
+
+                day.setHours(0);
+                day.setMinutes(0);
+                day.setSeconds(0);
+                day.setMilliseconds(0);
+
+                cell.classList.add("day-header");
+                // cell.className = "day-header";
+                if (day >= toDay && day <= toDay) {
+                    cell.classList.add("header-today");
+                    cell.dataset.date = isoDate;
+                }
+
+                if (day.getDay() === 0) {
+                    cell.classList.add("day-off");
+                }
+
+                const month = day.toLocaleString("default", { month: "short" });
+                const date = day.getDate();
+
+                cell.innerHTML = `<div>${month}</div><div>${date}</div>`;
+                const tooltip = new bootstrap.Tooltip(cell, {
+                    title: day.toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    }),
+                    placement: "top",
+                    trigger: "hover focus",
+                    container: "body"
+                });
+                datesGrid.appendChild(cell);
+            });
+
+            let z = 100;
+            employees.forEach(emp => {
+
+                days.forEach(day => {
+
+                    const cell = document.createElement("div");
+                    leaves.forEach(leave => {
+                        const start_date = new Date(leave.start_date);
+                        const end_date = new Date(leave.start_date);
+                        const start_date_1 = new Date(start_date);
+                        start_date_1.setDate(start_date.getDate() - 1);
+                        cell.classList.add("day-cell");
+                        // cell.className = "day-cell";
+                        // cell.classList.add("leave-Permission_AMD");
+                        if (leave.employee.id == emp.id && day >= start_date_1 && day <= end_date && leave.leave_type != "Medical_Leave_AMD") {
+                            cell.classList.add("leave-" + leave.leave_type.replace(/\s+/g, "_"));
+                            // cell.style.background = "red";
+                            console.log("LEAVE:", leave.leave_type);
+                            console.log("CELL:", cell);
+                            // cell.classList.add("leave-" + leave.leave_type);
+                            const numberOfDays = getNumberOfDays(leave.start_date, leave.end_date);
+                            const widthPerDay = 40;
+                            cell.style.width = (numberOfDays * widthPerDay) + 'px';
+                            cell.style.zIndex = z;
+                            z++;
+                            cell.setAttribute("data-bs-toggle", "popover");
+                            cell.setAttribute("data-bs-title", day.toLocaleDateString("fr-FR", {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            }));
+                            cell.setAttribute("data-bs-cell-type", "leave");
+                            start_date.setDate(start_date.getDate() + 1)
+                            end_date.setDate(end_date.getDate() + 1)
+                            cell.setAttribute("data-bs-leave", leave.leave_type + " (" + start_date.toLocaleDateString("fr-FR", {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            }) + " - " + end_date.toLocaleDateString("fr-FR", {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            }) + ")");
+                            const wrapper = document.createElement('div');
+                            wrapper.style.width = "100%";
+                            wrapper.style.height = "100%";
+                            wrapper.innerHTML = leave.leave_type
+                            wrapper.setAttribute("data-bs-toggle", "popover");
+                            wrapper.setAttribute("data-bs-title", emp.fullname);
+                            wrapper.setAttribute("data-bs-html", "true");
+                            wrapper.setAttribute("data-bs-content", `<b>Matricule:</b> ${emp.matricule}<br><b>Leave Type:</b> ${leave.leave_type}
+                            <br><b>Start Date:</b> ${start_date_1.toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            })}<br><b>End Date:</b> ${end_date.toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            })}
+                            <br>`);
+                            wrapper.setAttribute("data-bs-placement", "top");
+                            wrapper.classList.add("leave-bar-text");
+                            new bootstrap.Popover(wrapper, {
+                                container: 'body'
+                            });
+                            cell.appendChild(wrapper);
+                        }
+                        const toDay = new Date();
+                        toDay.setHours(0);
+                        toDay.setMinutes(0);
+                        toDay.setSeconds(0);
+                        toDay.setMilliseconds(0);
+
+                        day.setHours(0);
+                        day.setMinutes(0);
+                        day.setSeconds(0);
+                        day.setMilliseconds(0);
+
+                        if (day >= toDay && day <= toDay) {
+                            cell.classList.add("today");
+                        }
+
+                        if (day.getDay() === 0) {
+                            cell.classList.add("day-off");
+                        }
+                    });
+
+                    if (cell.getAttribute("data-bs-cell-type") == "leave") {
+                        const tooltip = new bootstrap.Tooltip(cell, {
+                            title: "" + cell.getAttribute("data-bs-leave"),
+                            placement: "bottom",
+                            trigger: "hover focus",
+                            container: "body"
+                        });
+                    } else {
+                        const tooltip = new bootstrap.Tooltip(cell, {
+                            title: day.toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                            }),
+                            placement: "bottom",
+                            trigger: "hover focus",
+                            container: "body"
+                        });
+                        cell.addEventListener('click', () => {
+                            tooltip.hide();
+                        });
+                    }
+
+                    datesGrid.appendChild(cell);
+                });
+
+            });
+
+        }
+
+        function generateDays() {
+
+            const days = [];
+            const start = new Date(year, startMonth - 1, 1);
+            const end = new Date(year, endMonth, 0);
+
+            let current = new Date(start);
+
+            while (current <= end) {
+                days.push(new Date(current));
+                current.setDate(current.getDate() + 1);
+            }
+
+            return days;
+
+        }
+
+        function scrollToToday() {
+            const container = document.querySelector(".dates-container");
+            const today = new Date().toISOString().split("T")[0];
+
+            const todayCell = document.querySelector(`[data-date="${today}"]`);
+
+            console.log("TODAY CELL:", todayCell);
+            if (todayCell) {
+                const left = todayCell.offsetLeft;
+
+                container.scrollTo({
+                    left: left - 600,
+                    behavior: "auto"
+                });
+            }
+        }
+        function getNumberOfDays(startDateStr, endDateStr) {
+            const start = new Date(startDateStr);
+            const end = new Date(endDateStr);
+            const diffTime = end - start;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            return diffDays + 1;
+        }
+        datesContainer.addEventListener("scroll", () => {
+            employeeColumn.scrollTop = datesContainer.scrollTop;
+        });
+
+        employeeColumn.addEventListener("scroll", () => {
+            datesContainer.scrollTop = employeeColumn.scrollTop;
+        });
+        function waitForTodayAndScroll() {
+            const container = document.querySelector(".dates-container");
+            const today = new Date().toISOString().split("T")[0];
+
+            const observer = new MutationObserver(() => {
+                const todayCell = document.querySelector(`[data-date="${today}"]`);
+                if (todayCell) {
+                    scrollToToday();
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(document.querySelector("#datesGrid"), {
+                childList: true,
+                subtree: true
+            });
+        }
+
+        loadPlanning();
+        waitForTodayAndScroll();
+
+    </script>
+    <script>
+        const input = document.getElementById('employeeSearch');
+        const results = document.getElementById('employeeResults');
+        const hiddenInput = document.getElementById('employee');
+        const submitButton = document.getElementById('submit');
+        let timeout = null;
+
+        input.addEventListener('input', () => {
+            clearTimeout(timeout);
+
+            const query = input.value.trim();
+            if (query.length < 2) {
+                results.innerHTML = '';
+                return;
+            }
+
+            timeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/employee/finding/search-list?q=${query}`);
+
+                    if (!res.ok) {
+                        console.error('HTTP error', res.status);
+                        return;
+                    }
+
+                    const data = await res.json();
+
+                    results.innerHTML = '';
+                    data.forEach(emp => {
+                        const li = document.createElement('li');
+                        li.classList.add('list-group-item');
+                        // li.classList.add('autocomplete-list-item');
+                        li.textContent = `${emp.matricule} - ${emp.fullname}`;
+                        li.onclick = () => {
+                            input.value = li.textContent;
+                            hiddenInput.value = emp.id;
+                            results.innerHTML = '';
+                        };
+                        results.appendChild(li);
+                    });
+
+                } catch (err) {
+                    console.error('Autocomplete error:', err);
+                }
+            }, 300);
+        });
+    </script>
+
+</body>
+
+</html>

@@ -6,19 +6,169 @@ import { Employee } from './entities/employee.entity';
 import { Repository } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
+import { Leave } from 'src/leave/entities/leave.entity';
 
 @Injectable()
 export class EmployeeService {
+
   constructor(
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
+    @InjectRepository(Leave)
+    private readonly leaveRepository: Repository<Leave>,
   ) { }
   create(createEmployeeDto: CreateEmployeeDto) {
     return this.employeeRepository.save(createEmployeeDto);
   }
 
+  findAllByLineAndDepartement(line: string | undefined, departement: string | undefined, skip: number, take: number, year: number) {
+    return this.employeeRepository.find({ where: { line, departement }, skip, take, order: { matricule: 'ASC' } });
+  }
+
+  private calculateAccruedLeave(year: number): number {
+    const today = new Date();
+
+    let total = 0;
+
+    for (let month = 0; month <= today.getMonth(); month++) {
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      if (month === today.getMonth()) {
+        total += (2.5 / daysInMonth) * today.getDate();
+      } else {
+        total += 2.5;
+      }
+    }
+
+    return parseFloat(total.toFixed(2));
+  }
+
+  async getEmployeesWithBalances(
+    line: string,
+    departement: string,
+    skip: number,
+    take: number,
+    year: number,
+  ) {
+
+    // 1️⃣ Récupérer les employés
+    const [employees, total] = await this.employeeRepository.findAndCount({
+      where: { line, departement },
+      order: { matricule: 'ASC' },
+      skip,
+      take,
+    });
+
+    if (employees.length === 0) {
+      return { data: [], total };
+    }
+
+    const employeeIds = employees.map(e => e.id);
+    console.log("employeeIds:", employeeIds);
+
+    // 2️⃣ Calcul jours pris (Local_Leave_AMD uniquement)
+    const takenLeaves = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id IN (:...employeeIds)', { employeeIds })
+      .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year })
+      .groupBy('employee.id')
+      .getRawMany();
+
+    console.log("takenLeaves:", takenLeaves);
+
+    const takenMap = new Map<string, number>();
+
+    takenLeaves.forEach(l => {
+      takenMap.set(l.employeeId, Number(l.daysTaken));
+    });
+
+    // 3️⃣ Calcul solde cumulatif dynamique
+    const today = new Date();
+
+    let soldeCumul = 0;
+
+    if (year < today.getFullYear()) {
+      // année passée → solde plein
+      soldeCumul = 2.5 * 12;
+    } else if (year > today.getFullYear()) {
+      // année future → rien
+      soldeCumul = 0;
+    } else {
+      // année en cours → calcul journalier
+      for (let m = 0; m <= today.getMonth(); m++) {
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+        if (m === today.getMonth()) {
+          soldeCumul += (2.5 / daysInMonth) * today.getDate();
+        } else {
+          soldeCumul += 2.5;
+        }
+      }
+    }
+
+    // 4️⃣ Fusion finale
+    const result = employees.map(emp => {
+      const pris = takenMap.get(emp.id) || 0;
+      const restant = soldeCumul - pris;
+
+      return {
+        ...emp,
+        solde_cumul: Number(soldeCumul.toFixed(2)),
+        solde_pris: Number(pris.toFixed(2)),
+        solde_restant: Number(restant.toFixed(2)),
+      };
+    });
+
+    return { data: result, total };
+  }
+
+  async findDepartement() {
+    const results = await this.employeeRepository
+      .createQueryBuilder('empoyee')
+      .select('DISTINCT empoyee.departement', 'departement')
+      .getRawMany();
+
+    // this.employeeRepository.find({
+    //   select: ['departement'],
+    //   where: {}
+    // })
+
+    return results.map(res => res.value);
+  }
+
+
+  async findAllDepartments(): Promise<string[]> {
+    const results = await this.employeeRepository
+      .createQueryBuilder('employee')
+      .select('DISTINCT employee.departement', 'departement')
+      .where('employee.departement IS NOT NULL')
+      .orderBy('employee.departement', 'ASC')
+      .getRawMany();
+
+    return results.map((res) => res.departement);
+  }
+
+  async findAllLines(): Promise<string[]> {
+    const results = await this.employeeRepository
+      .createQueryBuilder('employee')
+      .select('DISTINCT employee.line', 'line')
+      .where('employee.line IS NOT NULL')
+      .orderBy('employee.line', 'ASC')
+      .getRawMany();
+
+    return results.map((res) => res.line);
+  }
+
+
   findAll() {
-    return this.employeeRepository.find();
+    return this.employeeRepository.find({ order: { matricule: 'ASC' } });
   }
 
   findOne(id: string) {
@@ -185,6 +335,7 @@ export class EmployeeService {
 
   async search(q: string) {
     if (!q) return [];
+    const year = new Date().getFullYear();
     const [data] = await this.employeeRepository
       .createQueryBuilder('e')
       // .leftJoin('users', 'u', 'u.employee = e.matricule')
@@ -193,11 +344,74 @@ export class EmployeeService {
         { q: `%${q}%` },
       )
       // .andWhere('u.id IS NULL')
-      .select(['e.matricule', 'e.fullname'])
+      .select(['e.id', 'e.matricule', 'e.fullname'])
       .take(10)
       .getManyAndCount();
-    console.log("Data:", data);
-    return data;
+
+    const takenLeaves = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id IN (:...employeeIds)', { employeeIds: data.map((e) => e.id) })
+      .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year })
+      .groupBy('employee.id')
+      .getRawMany();
+    // console.log("Data:", takenLeaves);
+    // // return data;
+
+    // console.log("takenLeaves:", takenLeaves);
+
+    const takenMap = new Map<string, number>();
+
+    takenLeaves.forEach(l => {
+      takenMap.set(l.employeeId, Number(l.daysTaken));
+    });
+
+    // 3️⃣ Calcul solde cumulatif dynamique
+    const today = new Date();
+
+    let soldeCumul = 0;
+
+    if (year < today.getFullYear()) {
+      // année passée → solde plein
+      soldeCumul = 2.5 * 12;
+    } else if (year > today.getFullYear()) {
+      // année future → rien
+      soldeCumul = 0;
+    } else {
+      // année en cours → calcul journalier
+      for (let m = 0; m <= today.getMonth(); m++) {
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+        if (m === today.getMonth()) {
+          soldeCumul += (2.5 / daysInMonth) * today.getDate();
+        } else {
+          soldeCumul += 2.5;
+        }
+      }
+    }
+
+    // 4️⃣ Fusion finale
+    const result = data.map(emp => {
+      const pris = takenMap.get(emp.id) || 0;
+      const restant = soldeCumul - pris;
+
+      return {
+        ...emp,
+        solde_cumul: Number(soldeCumul.toFixed(2)),
+        solde_pris: Number(pris.toFixed(2)),
+        solde_restant: Number(restant.toFixed(2)),
+      };
+    });
+
+    console.log("Result:", result);
+
+    return result;
   }
 
   async findOneByMatricule(matricule: string) {

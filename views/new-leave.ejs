@@ -45,7 +45,7 @@
                 <input class="input" type="text" id="employeeSearch" placeholder="Search employee (matricule or name)"
                     autocomplete="off" />
                 <span class="icon left"><i class="mdi mdi-account"></i></span>
-                <input type="text" class="input" name="matricule" id="matricule" hidden required>
+                <input type="text" class="input" name="employee" id="employee" hidden required>
                 <ul id="employeeResults" class="autocomplete-list"></ul>
             </div>
         </div>
@@ -80,7 +80,7 @@
     <script>
         const input = document.getElementById('employeeSearch');
         const results = document.getElementById('employeeResults');
-        const hiddenInput = document.getElementById('matricule');
+        const hiddenInput = document.getElementById('employee');
         const submitButton = document.getElementById('submit');
 
         let timeout = null;
@@ -111,7 +111,7 @@
                         li.textContent = `${emp.matricule} - ${emp.fullname}`;
                         li.onclick = () => {
                             input.value = li.textContent;
-                            hiddenInput.value = emp.matricule;
+                            hiddenInput.value = emp.id;
                             results.innerHTML = '';
                         };
                         results.appendChild(li);

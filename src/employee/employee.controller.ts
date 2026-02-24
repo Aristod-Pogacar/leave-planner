@@ -41,6 +41,34 @@ export class EmployeeController {
     return this.employeeService.findByLineAndSection(line, section);
   }
 
+  @Get('find-all')
+  async findAllByLineAndSection(
+    @Query('line') line: string,
+    @Query('departement') departement: string,
+    @Query('skip') skip: number = 0,
+    @Query('take') take: number = 50,
+    @Query('year') year: number = new Date().getFullYear(),
+  ) {
+    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, +skip, +take, +year);
+    console.log("employees", employees);
+    return employees;
+    // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
+  }
+
+  @Get('test')
+  async test(
+    @Query('line') line: string,
+    @Query('departement') departement: string,
+    @Query('skip') skip: number = 0,
+    @Query('take') take: number = 50,
+    @Query('year') year: number = new Date().getFullYear(),
+  ) {
+    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, +skip, +take, +year);
+    console.log("employees", employees);
+    return employees;
+    // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
+  }
+
   @Get('import-master-file')
   @Render('import-master-file')
   async importMasterFile() {

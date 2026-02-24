@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Leave } from './entities/leave.entity';
 import { Between, Repository } from 'typeorm';
 import { Employee } from 'src/employee/entities/employee.entity';
+import * as express from 'express';
 
 @Injectable()
 export class LeaveService {
@@ -16,13 +17,17 @@ export class LeaveService {
     private readonly employeeRepository: Repository<Employee>,
   ) { }
 
-  async create(createLeaveDto: CreateLeaveDto) {
+  getLeavesByRange(year: number, startMonth: number, endMonth: number, line: string, departement: string) {
+    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, startMonth, 1), new Date(year, endMonth, 1)), employee: { line, departement } }, relations: ['employee'] });
+  }
+
+  async create(createLeaveDto: CreateLeaveDto, res: express.Response) {
     const employee = await this.employeeRepository.findOne({
       where: { id: createLeaveDto.employee },
     });
 
     if (!employee) {
-      throw new NotFoundException('Employee not found');
+      return res.status(500).redirect('/leave/new-leave?error=employeeNotFound');
     }
 
     const leave = await this.leaveRepository.create({
@@ -33,12 +38,98 @@ export class LeaveService {
     const startDate = new Date(createLeaveDto.start_date);
     const endDate = new Date(createLeaveDto.end_date);
 
+    if (startDate > endDate) {
+      return res.status(500).redirect('/leave/new-leave?error=startDateAfterEndDate');
+    }
+
+
+
     const nbDate = endDate.getTime() - startDate.getTime();
 
     leave.duration = (nbDate / (1000 * 60 * 60 * 24)) + 1;
+    await this.leaveRepository.save(leave);
 
-    return this.leaveRepository.save(leave);
+    return res.status(200).redirect('/leave/planning-view');
   }
+
+  async getEmployeeCumulativeBalance(employeeId: string = "", date: Date) {
+    if (!employeeId) {
+      return null;
+    }
+    console.log("Employee ID:", employeeId);
+    console.log("Date:", date.toISOString());
+    const [data] = await this.employeeRepository
+      .createQueryBuilder('e')
+      // .leftJoin('users', 'u', 'u.employee = e.matricule')
+      .where(
+        'e.id = :id',
+        { id: employeeId },
+      )
+      // .andWhere('u.id IS NULL')
+      .select(['e.id', 'e.matricule', 'e.fullname'])
+      .take(10)
+      .getManyAndCount();
+
+    console.log("EMPLOYEES:", data);
+
+    const takenLeaves = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id IN (:...employeeIds)', { employeeIds: [employeeId] })
+      .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year: date.getFullYear() })
+      .groupBy('employee.id')
+      .getRawMany();
+    console.log("Data:", takenLeaves);
+    // // return data;
+
+    // console.log("takenLeaves:", takenLeaves);
+
+    const takenMap = new Map<string, number>();
+
+    takenLeaves.forEach(l => {
+      takenMap.set(l.employeeId, Number(l.daysTaken));
+    });
+
+    // 3️⃣ Calcul solde cumulatif dynamique
+    // const today = new Date();
+
+    let soldeCumul = this.calculateCumulBalance(date);
+
+    // 4️⃣ Fusion finale
+    const result = data.map(emp => {
+      const pris = takenMap.get(emp.id) || 0;
+      const restant = soldeCumul - pris;
+
+      return {
+        ...emp,
+        solde_cumul: Number(soldeCumul.toFixed(2)),
+        solde_pris: Number(pris.toFixed(2)),
+        solde_restant: Number(restant.toFixed(2)),
+      };
+    });
+    return result[0];
+  }
+
+  calculateCumulBalance(date: Date) {
+    let soldeCumul = 0;
+    for (let m = 0; m <= date.getMonth(); m++) {
+      const daysInMonth = new Date(date.getFullYear(), m + 1, 0).getDate();
+
+      if (m === date.getMonth()) {
+        soldeCumul += (2.5 / daysInMonth) * date.getDate();
+      } else {
+        soldeCumul += 2.5;
+      }
+    }
+    return soldeCumul;
+  }
+
 
   findAll() {
     return this.leaveRepository.find();
