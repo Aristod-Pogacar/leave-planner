@@ -344,7 +344,7 @@ export class EmployeeService {
         { q: `%${q}%` },
       )
       // .andWhere('u.id IS NULL')
-      .select(['e.id', 'e.matricule', 'e.fullname'])
+      .select(['e.id', 'e.matricule', 'e.fullname', 'e.line', 'e.departement', 'e.section', 'e.site', 'e.section'])
       .take(10)
       .getManyAndCount();
 

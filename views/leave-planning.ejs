@@ -254,60 +254,7 @@
                 </button>
             </div>
         </div>
-        <!-- <div class="modal modal-lg fade" id="leaveModals" tabindex="-1" aria-labelledby="leaveModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="leaveModalLabel">Planifier un congé</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="/leave/new-leave" method="POST">
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="employee" class="form-label">Employé</label>
-                                <input class="form-control" type=" text" id="employeeSearch"
-                                    placeholder="Search employee (matricule or name)" autocomplete="off" />
-                                <span class="icon left"><i class="mdi mdi-account"></i></span>
-                                <input type="text" class="input" name="employee" id="employee" hidden required>
-                                <ul id="employeeResults" class="autocomplete-list ms-1 ps-0 w-full"></ul>
-                            </div>
-                            <div class="mb-3">
-                                <label for="leave_type" class="form-label">Type de congé</label>
-                                <select name="leave_type" id="leave_type" class="form-select">
-                                    <option value="Local_Leave_AMD">Congés annuels</option>
-                                    <option value="Permission_AMD">Permission</option>
-                                    <option value="Indisponibilite_AMD">Indisponibilité</option>
-                                </select>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="start_date" class="form-label">Date de début</label>
-                                        <input type="date" class="form-control" id="start_date" name="start_date"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="end_date" class="form-label">Date de fin</label>
-                                        <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="reason" class="form-label">Raison</label>
-                                <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
+
         <!-- Modal Planifier Congé -->
         <div class="modal fade" id="leaveModal" tabindex="-1">
             <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -323,7 +270,7 @@
 
                             <!-- ===== LEFT: FORM ===== -->
                             <div class="col-md-6 border-end">
-                                <form id="leaveForm">
+                                <form id="leaveForm" method="POST" action="/leave/new-leave">
 
                                     <!-- Recherche Employé -->
                                     <div class="mb-3">
@@ -334,29 +281,28 @@
                                         <ul id="employeeResults" class="autocomplete-list ms-1 ps-0"></ul>
                                     </div>
 
-                                    <!-- ID caché -->
-                                    <!-- <input type="hidden" required name="employee" id="employee"> -->
-
                                     <!-- Type -->
                                     <div class="mb-3">
                                         <label class="form-label">Type de congé</label>
-                                        <select class="form-select" name="type">
-                                            <option value="annuel" selected>Congés annuel</option>
-                                            <option value="permission">Permission</option>
-                                            <option value="indisponibilite">Indisponibilité</option>
+                                        <select class="form-select" name="leave_type" id="leave_type">
+                                            <option value="Local_Leave_AMD" selected>Congés annuel</option>
+                                            <option value="Permission_AMD">Permission</option>
+                                            <option value="Indisponibilite_AMD">Indisponibilité</option>
                                         </select>
                                     </div>
 
                                     <!-- Date début -->
-                                    <div class="mb-3">
-                                        <label class="form-label">Date début</label>
-                                        <input type="date" class="form-control" name="startDate" id="startDate">
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Date début</label>
+                                            <input type="date" class="form-control" name="start_date" id="startDate">
+                                        </div>
 
-                                    <!-- Date fin -->
-                                    <div class="mb-3">
-                                        <label class="form-label">Date fin</label>
-                                        <input type="date" class="form-control" name="endDate" id="endDate">
+                                        <!-- Date fin -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Date fin</label>
+                                            <input type="date" class="form-control" name="end_date" id="endDate">
+                                        </div>
                                     </div>
 
                                     <!-- Raison -->
@@ -370,10 +316,36 @@
 
                             <!-- ===== RIGHT: INFOS ===== -->
                             <div class="col-md-6">
-                                <h6 class="mb-4">Informations employé</h6>
 
                                 <div class="card mb-3 shadow-sm">
+                                    <div class="card-header text-center fw-bold">
+                                        Informations employé
+                                    </div>
                                     <div class="card-body">
+                                        <p class="mb-2">
+                                            <strong>Nom complet :</strong>
+                                            <span id="fullname">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Matricule :</strong>
+                                            <span id="matricule">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Site :</strong>
+                                            <span id="site">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Line :</strong>
+                                            <span id="line">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Département :</strong>
+                                            <span id="departement">-</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Section :</strong>
+                                            <span id="section">-</span>
+                                        </p>
                                         <p class="mb-2">
                                             <strong>Solde cumulés :</strong>
                                             <span id="soldeCumule">-</span>
@@ -391,13 +363,18 @@
                             </div>
 
                         </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 text-center">
+                                <p id="message" class="fw-bold"></p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             Annuler
                         </button>
-                        <button type="submit" form="leaveForm" class="btn btn-primary">
+                        <button type="submit" form="leaveForm" class="btn btn-primary" id="submit">
                             Enregistrer
                         </button>
                     </div>
@@ -440,6 +417,8 @@
         const employeeColumn = document.getElementById("employeeColumn");
         const datesContainer = document.getElementById("datesContainer");
         const datesGrid = document.getElementById("datesGrid");
+
+        let solde = 0;
 
         const query = new URLSearchParams(window.location.search);
 
@@ -781,11 +760,43 @@
 
     </script>
     <script>
+        var message = "";
+
         const input = document.getElementById('employeeSearch');
         const results = document.getElementById('employeeResults');
         const hiddenInput = document.getElementById('employee');
         const submitButton = document.getElementById('submit');
         let timeout = null;
+
+        const startDate = document.getElementById('startDate');
+        startDate.value = new Date().toISOString().split("T")[0];
+        const endDate = document.getElementById('endDate');
+        endDate.value = new Date().toISOString().split("T")[0];
+        // const hiddenInput = document.getElementById('employee');
+
+        const leaveType = document.getElementById('leave_type');
+        leaveType.addEventListener('change', () => {
+            if (leaveType.value === 'Local_Leave_AMD') {
+                checkValableLeave()
+            } else {
+                submitButton.disabled = false;
+                message = "";
+                document.getElementById('message').textContent = "";
+            }
+        })
+
+        startDate.addEventListener('change', checkValableLeave);
+        endDate.addEventListener('change', checkValableLeave);
+
+        const fullname = document.getElementById('fullname');
+        const matricule = document.getElementById('matricule');
+        const site = document.getElementById('site');
+        const line = document.getElementById('line');
+        const departement = document.getElementById('departement');
+        const section = document.getElementById('section');
+        const soldeCumule = document.getElementById('soldeCumule');
+        const soldePris = document.getElementById('soldePris');
+        const soldeRestant = document.getElementById('soldeRestant');
 
         input.addEventListener('input', () => {
             clearTimeout(timeout);
@@ -816,6 +827,17 @@
                         li.onclick = () => {
                             input.value = li.textContent;
                             hiddenInput.value = emp.id;
+                            fullname.textContent = emp.fullname;
+                            matricule.textContent = emp.matricule;
+                            site.textContent = emp.site;
+                            line.textContent = emp.line;
+                            departement.textContent = emp.departement;
+                            section.textContent = emp.section;
+                            soldeCumule.textContent = emp.solde_cumul;
+                            soldePris.textContent = emp.solde_pris;
+                            soldeRestant.textContent = emp.solde_restant;
+                            solde = emp.solde_restant;
+                            checkValableLeave();
                             results.innerHTML = '';
                         };
                         results.appendChild(li);
@@ -826,6 +848,47 @@
                 }
             }, 300);
         });
+
+        function checkValableLeave() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const messageContainer = document.getElementById('message');
+            // const solde = document.getElementById('soldeRestant').textContent;
+            const numberOfDays = getNumberOfDays(startDate, endDate);
+            console.log("NUMBER OF DAYS:", numberOfDays)
+            if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
+                message = "Date invalide";
+                submitButton.disabled = true;
+                messageContainer.innerHTML = message;
+                messageContainer.style.color = "red";
+            } else if ((solde === null || solde === undefined || solde === "")) {
+                message = "Veuillez choisir un employé";
+                submitButton.disabled = true;
+                messageContainer.innerHTML = message;
+                messageContainer.style.color = "red";
+            } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays > solde) {
+                message = "Solde de congé: " + solde + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)";
+                submitButton.disabled = true;
+                messageContainer.innerHTML = message;
+                messageContainer.style.color = "red";
+            } else {
+                submitButton.disabled = false;
+                message = "Congé valable";
+                messageContainer.style.color = "green";
+                document.getElementById('message').textContent = message;
+            }
+        }
+        function checkDate(startDate, endDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
+            if (startDateObj <= endDateObj && startDateObj >= today) {
+                return true
+            } else {
+                return false
+            }
+        }
     </script>
 
 </body>

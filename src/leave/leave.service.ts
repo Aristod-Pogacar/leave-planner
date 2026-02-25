@@ -49,7 +49,7 @@ export class LeaveService {
     leave.duration = (nbDate / (1000 * 60 * 60 * 24)) + 1;
     await this.leaveRepository.save(leave);
 
-    return res.status(200).redirect('/leave/planning-view');
+    return res.status(200).redirect('/leave/planning-view?line=' + employee.line + '&departement=' + employee.departement);
   }
 
   async getEmployeeCumulativeBalance(employeeId: string = "", date: Date) {
