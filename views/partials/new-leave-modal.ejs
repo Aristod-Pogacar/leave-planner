@@ -4,7 +4,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Nouveau congé</h5>
+                <h5 class="modal-title">New leave</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -17,40 +17,40 @@
 
                             <!-- Recherche Employé -->
                             <div class="mb-3">
-                                <label class="form-label">Employé</label>
+                                <label class="form-label">Employee</label>
                                 <input type="text" class="form-control" id="employeeSearch" autocomplete="off"
-                                    placeholder="Rechercher un employé...">
+                                    placeholder="Search an employee...">
                                 <input type="text" class="input" name="employee" id="employee" hidden required>
                                 <ul id="employeeResults" class="autocomplete-list ms-1 ps-0"></ul>
                             </div>
 
                             <!-- Type -->
                             <div class="mb-3">
-                                <label class="form-label">Type de congé</label>
+                                <label class="form-label">Leave type</label>
                                 <select class="form-select" name="leave_type" id="leave_type">
-                                    <option value="Local_Leave_AMD" selected>Congés annuel</option>
+                                    <option value="Local_Leave_AMD" selected>Local leave</option>
                                     <option value="Permission_AMD">Permission</option>
-                                    <option value="Indisponibilite_AMD">Indisponibilité</option>
+                                    <option value="Indisponibilite_AMD">Indisponibiliyé</option>
                                 </select>
                             </div>
 
                             <!-- Date début -->
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label">Date début</label>
+                                    <label class="form-label">Starting date</label>
                                     <input type="date" class="form-control" name="start_date" id="startDate">
                                 </div>
 
                                 <!-- Date fin -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Date fin</label>
+                                    <label class="form-label">Ending date</label>
                                     <input type="date" class="form-control" name="end_date" id="endDate">
                                 </div>
                             </div>
 
                             <!-- Raison -->
                             <div class="mb-3">
-                                <label class="form-label">Raison (facultatif)</label>
+                                <label class="form-label">Reason</label>
                                 <textarea class="form-control" name="reason" rows="3"></textarea>
                             </div>
 
@@ -62,11 +62,11 @@
 
                         <div class="card mb-3 shadow-sm">
                             <div class="card-header text-center fw-bold">
-                                Informations employé
+                                Employee information
                             </div>
                             <div class="card-body">
                                 <p class="mb-2">
-                                    <strong>Nom complet :</strong>
+                                    <strong>Fullname :</strong>
                                     <span id="fullname">-</span>
                                 </p>
                                 <p class="mb-2">
@@ -82,7 +82,7 @@
                                     <span id="line">-</span>
                                 </p>
                                 <p class="mb-2">
-                                    <strong>Département :</strong>
+                                    <strong>Departement :</strong>
                                     <span id="departement">-</span>
                                 </p>
                                 <p class="mb-2">
@@ -90,15 +90,15 @@
                                     <span id="section">-</span>
                                 </p>
                                 <p class="mb-2">
-                                    <strong>Solde cumulés :</strong>
+                                    <strong>Cumulated solde :</strong>
                                     <span id="soldeCumule">-</span>
                                 </p>
                                 <p class="mb-2">
-                                    <strong>Solde pris :</strong>
+                                    <strong>Taken solde :</strong>
                                     <span id="soldePris">-</span>
                                 </p>
                                 <p class="mb-0">
-                                    <strong>Solde restant :</strong>
+                                    <strong>Solde left :</strong>
                                     <span id="soldeRestant" class="fw-bold text-primary">-</span>
                                 </p>
                             </div>
@@ -115,10 +115,10 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Annuler
+                    Cancel
                 </button>
                 <button type="submit" form="leaveForm" class="btn btn-primary" id="submit">
-                    Enregistrer
+                    Save
                 </button>
             </div>
 
@@ -223,23 +223,23 @@
         const numberOfDays = getNumberOfDays(startDate, endDate);
         console.log("NUMBER OF DAYS:", numberOfDays)
         if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
-            message = "Date invalide";
+            message = "Invalide date";
             submitButton.disabled = true;
             messageContainer.innerHTML = message;
             messageContainer.style.color = "red";
         } else if ((solde === null || solde === undefined || solde === "")) {
-            message = "Veuillez choisir un employé";
+            message = "Choose an employee";
             submitButton.disabled = true;
             messageContainer.innerHTML = message;
             messageContainer.style.color = "red";
         } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays > solde) {
-            message = "Solde de congé: " + solde + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)";
+            message = "Solde left(" + solde + " days) is not enough for your request(" + numberOfDays + " days)";
             submitButton.disabled = true;
             messageContainer.innerHTML = message;
             messageContainer.style.color = "red";
         } else {
             submitButton.disabled = false;
-            message = "Congé valable";
+            message = "Your request is possible";
             messageContainer.style.color = "green";
             document.getElementById('message').textContent = message;
         }

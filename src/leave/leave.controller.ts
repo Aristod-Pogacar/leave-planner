@@ -82,6 +82,18 @@ export class LeaveController {
     return this.leaveService.getLeavesByRange(year, startMonth, endMonth, line, departement);
   }
 
+  @Get('month-line-departement')
+  async getLeavesByMonthAndLineAndDepartement(
+    @Query('year') year: number,
+    @Query('month') month: number,
+    @Query('line') line: string,
+    @Query('departement') departement: string,
+  ) {
+    console.log("LINE:", line);
+    console.log("DEPARTEMENT:", departement);
+    return this.leaveService.getLeavesByMonthAndLineAndDepartement(year, month, line, departement);
+  }
+
   @Get('planning')
   async getPlanning(
     @Query('year') year: number,

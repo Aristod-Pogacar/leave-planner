@@ -8,12 +8,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
-                <div class="row">
+            <form method="POST" action="/leave/new-leave" id="formSimulation">
+                <div class="modal-body">
+                    <div class="row">
 
-                    <!-- ===== LEFT: FORM ===== -->
-                    <div class="col-md-6 border-end">
-                        <form id="leaveForm" method="POST" action="/leave/new-leave" id="formSimulation">
+                        <!-- ===== LEFT: FORM ===== -->
+                        <div class="col-md-6 border-end">
 
                             <!-- Recherche Employé -->
                             <div class="mb-3">
@@ -26,14 +26,12 @@
                             </div>
 
                             <!-- Type -->
-                            <!-- <div class="mb-3">
+                            <div class="mb-3 d-none">
                                 <label class="form-label">Type de congé</label>
                                 <select class="form-select" name="leave_type" id="leave_type1">
                                     <option value="Local_Leave_AMD" selected>Congés annuel</option>
-                                    <option value="Permission_AMD">Permission</option>
-                                    <option value="Indisponibilite_AMD">Indisponibilité</option>
                                 </select>
-                            </div> -->
+                            </div>
 
                             <!-- Date début -->
                             <div class="row">
@@ -50,120 +48,73 @@
                             </div>
 
                             <!-- Raison -->
-                            <!-- <div class="mb-3">
+                            <div class="mb-3">
                                 <label class="form-label">Raison (facultatif)</label>
-                                <textarea class="form-control" name="reason" rows="3"></textarea>
-                            </div> -->
-
-                        </form>
-                    </div>
-
-                    <!-- ===== RIGHT: INFOS ===== -->
-                    <div class="col-md-6">
-
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-header text-center fw-bold">
-                                Solde actuel
+                                <textarea class="form-control" name="reason1" rows="3"></textarea>
                             </div>
-                            <div class="card-body">
-                                <!-- <p class="mb-2">
-                                    <strong>Nom complet :</strong>
-                                    <span id="fullname">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Matricule :</strong>
-                                    <span id="matricule">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Site :</strong>
-                                    <span id="site">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Line :</strong>
-                                    <span id="line">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Département :</strong>
-                                    <span id="departement">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Section :</strong>
-                                    <span id="section">-</span>
-                                </p> -->
-                                <p class="mb-2">
-                                    <strong>Solde cumulés :</strong>
-                                    <span id="soldeCumule1">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Solde pris :</strong>
-                                    <span id="soldePris1">-</span>
-                                </p>
-                                <p class="mb-0">
-                                    <strong>Solde restant :</strong>
-                                    <span id="soldeRestant1" class="fw-bold text-primary">-</span>
-                                </p>
-                            </div>
+                            <!-- <input type="submit" hidden> -->
+
                         </div>
 
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-header text-center fw-bold">
-                                Solde simulé
+                        <!-- ===== RIGHT: INFOS ===== -->
+                        <div class="col-md-6">
+
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header text-center fw-bold">
+                                    Solde actuel
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <strong>Solde cumulés :</strong>
+                                        <span id="soldeCumule1">-</span>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Solde pris :</strong>
+                                        <span id="soldePris1">-</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Solde restant :</strong>
+                                        <span id="soldeRestant1" class="fw-bold text-primary">-</span>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <!-- <p class="mb-2">
-                                    <strong>Nom complet :</strong>
-                                    <span id="fullname">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Matricule :</strong>
-                                    <span id="matricule">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Site :</strong>
-                                    <span id="site">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Line :</strong>
-                                    <span id="line">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Département :</strong>
-                                    <span id="departement">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Section :</strong>
-                                    <span id="section">-</span>
-                                </p> -->
-                                <p class="mb-2">
-                                    <strong>Solde cumulés :</strong>
-                                    <span id="soldeCumule2">-</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Solde pris :</strong>
-                                    <span id="soldePris2">-</span>
-                                </p>
-                                <p class="mb-0">
-                                    <strong>Solde restant :</strong>
-                                    <span id="soldeRestant2" class="fw-bold text-primary">-</span>
-                                </p>
-                                <hr>
-                                <div class="d-grid gap-2">
-                                    <button type="submit" form="leaveForm" class="btn btn-success" disabled
-                                        id="submit1">
-                                        Planifier
-                                    </button>
+
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-header text-center fw-bold">
+                                    Solde simulé
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <strong>Solde cumulés :</strong>
+                                        <span id="soldeCumule2">-</span>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Solde pris :</strong>
+                                        <span id="soldePris2">-</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Solde restant :</strong>
+                                        <span id="soldeRestant2" class="fw-bold text-primary">-</span>
+                                    </p>
+                                    <hr>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" form="formSimulation" class="btn btn-success" disabled
+                                            id="submit1">
+                                            Planifier
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-12 text-center">
-                        <p id="message1" class="fw-bold"></p>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12 text-center">
+                            <p id="message1" class="fw-bold"></p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -184,6 +135,7 @@
     const results1 = document.getElementById('employeeResults1');
     const hiddenInput1 = document.getElementById('employee1');
     const hiddenInputMatricule1 = document.getElementById('matricule1');
+    const reasonInput1 = document.getElementById('reason1');
     const submitButton1 = document.getElementById('submit1');
     const simulateButton = document.getElementById('simulateButton');
     const formSimulation = document.getElementById('formSimulation');
@@ -198,9 +150,53 @@
     // startDate1.addEventListener('change', checkSimulationLeave);
     // endDate1.addEventListener('change', checkSimulationLeave);
 
-    submitButton1.addEventListener('click', () => {
-        formSimulation.submit();
-    });
+    // submitButton1.addEventListener('click', async () => {
+    //     // formSimulation.submit();
+    //     try {
+    //         const res = await fetch(`/leave/new-leave`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({
+    //                 employee: hiddenInput1.value,
+    //                 reason: reasonInput1.value,
+    //                 startDate: startDate1.value,
+    //                 endDate: endDate1.value,
+    //             }),
+    //         });
+
+    //         if (!res.ok) {
+    //             console.error('HTTP error', res.status);
+    //             return;
+    //         }
+
+    //         const data = await res.json();
+
+    //         // results1.innerHTML = '';
+    //         // data.forEach(emp => {
+    //         //     const li = document.createElement('li');
+    //         //     li.classList.add('list-group-item');
+    //         //     // li.classList.add('autocomplete-list-item');
+    //         //     li.textContent = `${emp.matricule} - ${emp.fullname}`;
+    //         //     li.onclick = () => {
+    //         //         input1.value = li.textContent;
+    //         //         hiddenInput1.value = emp.id;
+    //         //         hiddenInputMatricule1.value = emp.matricule;
+    //         //         soldeCumule1.textContent = emp.solde_cumul;
+    //         //         soldePris1.textContent = emp.solde_pris;
+    //         //         soldeRestant1.textContent = emp.solde_restant;
+    //         //         solde = emp.solde_restant;
+    //         //         checkSimulationLeave();
+    //         //         results1.innerHTML = '';
+    //         //     };
+    //         //     results1.appendChild(li);
+    //         // });
+
+    //     } catch (err) {
+    //         console.error('Autocomplete error:', err);
+    //     }
+    // });
 
     simulateButton.addEventListener('click', checkSimulationLeave);
 
@@ -248,7 +244,7 @@
                         soldePris1.textContent = emp.solde_pris;
                         soldeRestant1.textContent = emp.solde_restant;
                         solde = emp.solde_restant;
-                        checkSimulationLeave();
+                        // checkSimulationLeave();
                         results1.innerHTML = '';
                     };
                     results1.appendChild(li);
@@ -302,7 +298,7 @@
             } else {
                 submitButton1.disabled = false;
                 messageContainer.style.color = "green";
-                messageContainer.innerHTML = "Congé valable";
+                messageContainer.innerHTML = "Congé valable pour la demande de " + numberOfDays + " jours.";
             }
         });
     }

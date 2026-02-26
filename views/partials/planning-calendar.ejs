@@ -13,7 +13,6 @@
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
     const isoDate = new Date().toISOString().split("T")[0];
-    console.log("ISO DATE:", isoDate);
     const employeeColumn = document.getElementById("employeeColumn");
     const datesContainer = document.getElementById("datesContainer");
     const datesGrid = document.getElementById("datesGrid");
@@ -29,6 +28,8 @@
     let leaves = [];
 
     const year = 2026;
+    let currentStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    let currentEndDate = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0);
     const startMonth = new Date().getMonth() + 1;
     const endMonth = startMonth + 2;
 
@@ -60,13 +61,8 @@
         const take = 20;
 
         const employeeUrl = `http://localhost:3000/employee/find-all?line=${line}&departement=${departement}&skip=${skip}&take=${take}`;
-        console.log("EMPLOYEE URL:", employeeUrl);
 
         const res = await fetch(employeeUrl);
-
-        //   const res = await fetch(
-        //     `http://127.0.0.1:3000/planning?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&section=${section}&skip=0&take=50`
-        //   );
 
         if (!res.ok) {
             console.error("Erreur API");
@@ -74,17 +70,14 @@
         }
 
         const data = await res.json();
-        console.log("DATA:", data);
 
         employees = data.data;
 
         const leaveUrl = `http://localhost:3000/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}`;
-        console.log("LEAVE URL:", leaveUrl);
 
         const resLeave = await fetch(leaveUrl);
 
         leaves = await resLeave.json();
-        console.log("leaves", leaves);
 
         // leaves = data.leaves;
 
@@ -128,7 +121,7 @@
 
         datesGrid.innerHTML = "";
 
-        const days = generateDays();
+        const days = generateDays(currentStartDate, currentEndDate);
         datesGrid.style.gridTemplateColumns = `repeat(${days.length}, 40px)`;
 
         days.forEach(day => {
@@ -184,14 +177,8 @@
                     const start_date_1 = new Date(start_date);
                     start_date_1.setDate(start_date.getDate() - 1);
                     cell.classList.add("day-cell");
-                    // cell.className = "day-cell";
-                    // cell.classList.add("leave-Permission_AMD");
                     if (leave.employee.id == emp.id && day >= start_date_1 && day <= end_date && leave.leave_type != "Medical_Leave_AMD") {
                         cell.classList.add("leave-" + leave.leave_type.replace(/\s+/g, "_"));
-                        // cell.style.background = "red";
-                        console.log("LEAVE:", leave.leave_type);
-                        console.log("CELL:", cell);
-                        // cell.classList.add("leave-" + leave.leave_type);
                         const numberOfDays = getNumberOfDays(leave.start_date, leave.end_date);
                         const widthPerDay = 40;
                         cell.style.width = (numberOfDays * widthPerDay) + 'px';
@@ -290,30 +277,12 @@
 
     }
 
-    function generateDays() {
-
-        const days = [];
-        const start = new Date(year, startMonth - 1, 1);
-        const end = new Date(year, endMonth, 0);
-
-        let current = new Date(start);
-
-        while (current <= end) {
-            days.push(new Date(current));
-            current.setDate(current.getDate() + 1);
-        }
-
-        return days;
-
-    }
-
     function scrollToToday() {
         const container = document.querySelector(".dates-container");
         const today = new Date().toISOString().split("T")[0];
 
         const todayCell = document.querySelector(`[data-date="${today}"]`);
 
-        console.log("TODAY CELL:", todayCell);
         if (todayCell) {
             const left = todayCell.offsetLeft;
 
@@ -331,7 +300,19 @@
         return diffDays + 1;
     }
     datesContainer.addEventListener("scroll", () => {
-        employeeColumn.scrollTop = datesContainer.scrollTop;
+
+        const scrollLeft = datesContainer.scrollLeft;
+        const maxScroll = datesContainer.scrollWidth - datesContainer.clientWidth;
+
+        // 👉 Si on arrive à droite
+        if (scrollLeft >= maxScroll - 5) {
+            addNextMonth();
+        }
+
+        // 👉 Si on arrive à gauche
+        if (scrollLeft <= 5) {
+            addPreviousMonth();
+        }
     });
 
     employeeColumn.addEventListener("scroll", () => {
@@ -355,6 +336,70 @@
         });
     }
 
+    function generateDays(startDate, endDate) {
+        const days = [];
+        let current = new Date(startDate);
+
+        while (current <= endDate) {
+            days.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+
+        return days;
+    }
+    async function addNextMonth() {
+
+        const nextMonthStart = new Date(currentEndDate.getFullYear(), currentEndDate.getMonth() + 1, 1);
+        const nextMonthEnd = new Date(nextMonthStart.getFullYear(), nextMonthStart.getMonth() + 1, 0);
+
+        await loadLeavesForRange(nextMonthStart, nextMonthEnd);
+
+        currentEndDate = nextMonthEnd;
+
+        renderCalendar();
+    }
+
+    async function addPreviousMonth() {
+
+        const prevMonthStart = new Date(currentStartDate.getFullYear(), currentStartDate.getMonth() - 1, 1);
+        const prevMonthEnd = new Date(currentStartDate.getFullYear(), currentStartDate.getMonth(), 0);
+
+        await loadLeavesForRange(prevMonthStart, prevMonthEnd);
+
+        currentStartDate = prevMonthStart;
+
+        renderCalendar();
+
+        setTimeout(() => {
+            datesContainer.scrollLeft = 200;
+        }, 50);
+    }
+
+    async function loadLeavesForRange(startDate, endDate) {
+
+        const line = lineElement.value || defaultLine;
+        const departement = departementElement.value || defaultDepartement;
+
+        const newYear = startDate.getFullYear();
+        const newStartMonth = startDate.getMonth();
+        const newEndMonth = endDate.getMonth();
+
+        const leaveUrl = `http://localhost:3000/leave/month-line-departement?year=${newYear}&month=${newStartMonth}&line=${line}&departement=${departement}`;
+
+        const res = await fetch(leaveUrl);
+
+        if (!res.ok) return;
+
+        const newLeaves = await res.json();
+
+        // 🔥 fusionner sans doublons
+        newLeaves.forEach(newLeave => {
+            const exists = leaves.some(l => l.id === newLeave.id);
+            if (!exists) {
+                leaves.push(newLeave);
+            }
+        });
+    }
     loadPlanning();
     waitForTodayAndScroll();
 

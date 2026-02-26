@@ -21,6 +21,10 @@ export class LeaveService {
     return this.leaveRepository.find({ where: { start_date: Between(new Date(year, startMonth, 1), new Date(year, endMonth, 1)), employee: { line, departement } }, relations: ['employee'] });
   }
 
+  getLeavesByMonthAndLineAndDepartement(year: number, month: number, line: string, departement: string) {
+    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, month, 1), new Date(year, month, 31)), employee: { line, departement } }, relations: ['employee'] });
+  }
+
   async create(createLeaveDto: CreateLeaveDto, res: express.Response) {
     const employee = await this.employeeRepository.findOne({
       where: { id: createLeaveDto.employee },
