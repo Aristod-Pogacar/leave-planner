@@ -13,26 +13,26 @@ import { Employee } from './employee/entities/employee.entity';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'mysql',
-    //   host: 'localhost',
-    //   port: 3306,
-    //   username: 'root',
-    //   password: '',
-    //   // database: 'leave_planner_test',
-    //   database: 'leave_planner',
-    //   entities: [
-    //     Leave,
-    //     Employee
-    //   ],
-    //   synchronize: true,
-    // }),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'database.sqlite',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      // database: 'leave_planner_test',
+      database: 'leave_planner',
+      entities: [
+        Leave,
+        Employee
+      ],
       synchronize: true,
     }),
+    // TypeOrmModule.forRoot({
+    //   type: 'sqlite',
+    //   database: 'database.sqlite',
+    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    //   synchronize: true,
+    // }),
     EmployeeModule,
     LeaveModule,
   ],
