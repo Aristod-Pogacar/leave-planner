@@ -4,7 +4,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Simuler congé</h5>
+                <h5 class="modal-title">Simulate leave</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -17,9 +17,9 @@
 
                             <!-- Recherche Employé -->
                             <div class="mb-3">
-                                <label class="form-label">Employé</label>
+                                <label class="form-label">Employee</label>
                                 <input type="text" class="form-control" id="employeeSearch1" autocomplete="off"
-                                    placeholder="Rechercher un employé...">
+                                    placeholder="Search an employee...">
                                 <input type="text" class="input" name="employee" id="employee1" hidden required>
                                 <input type="text" class="input" name="matricule" id="matricule1" hidden required>
                                 <ul id="employeeResults1" class="autocomplete-list ms-1 ps-0"></ul>
@@ -27,29 +27,29 @@
 
                             <!-- Type -->
                             <div class="mb-3 d-none">
-                                <label class="form-label">Type de congé</label>
+                                <label class="form-label">Leave type</label>
                                 <select class="form-select" name="leave_type" id="leave_type1">
-                                    <option value="Local_Leave_AMD" selected>Congés annuel</option>
+                                    <option value="Local_Leave_AMD" selected>Local leave</option>
                                 </select>
                             </div>
 
                             <!-- Date début -->
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label">Date début</label>
+                                    <label class="form-label">Starting date</label>
                                     <input type="date" class="form-control" name="start_date" id="startDate1">
                                 </div>
 
                                 <!-- Date fin -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Date fin</label>
+                                    <label class="form-label">Ending date</label>
                                     <input type="date" class="form-control" name="end_date" id="endDate1">
                                 </div>
                             </div>
 
                             <!-- Raison -->
                             <div class="mb-3">
-                                <label class="form-label">Raison (facultatif)</label>
+                                <label class="form-label">Remarks</label>
                                 <textarea class="form-control" name="reason1" rows="3"></textarea>
                             </div>
                             <!-- <input type="submit" hidden> -->
@@ -61,19 +61,19 @@
 
                             <div class="card mb-3 shadow-sm">
                                 <div class="card-header text-center fw-bold">
-                                    Solde actuel
+                                    Actual leave balance
                                 </div>
                                 <div class="card-body">
                                     <p class="mb-2">
-                                        <strong>Solde cumulés :</strong>
+                                        <strong>Cumulated leaves :</strong>
                                         <span id="soldeCumule1">-</span>
                                     </p>
                                     <p class="mb-2">
-                                        <strong>Solde pris :</strong>
+                                        <strong>Taken leaves :</strong>
                                         <span id="soldePris1">-</span>
                                     </p>
                                     <p class="mb-0">
-                                        <strong>Solde restant :</strong>
+                                        <strong>Leaves left :</strong>
                                         <span id="soldeRestant1" class="fw-bold text-primary">-</span>
                                     </p>
                                 </div>
@@ -81,26 +81,26 @@
 
                             <div class="card mb-3 shadow-sm">
                                 <div class="card-header text-center fw-bold">
-                                    Solde simulé
+                                    Simulated leave balance
                                 </div>
                                 <div class="card-body">
                                     <p class="mb-2">
-                                        <strong>Solde cumulés :</strong>
+                                        <strong>Cumulated leaves :</strong>
                                         <span id="soldeCumule2">-</span>
                                     </p>
                                     <p class="mb-2">
-                                        <strong>Solde pris :</strong>
+                                        <strong>Taken leaves :</strong>
                                         <span id="soldePris2">-</span>
                                     </p>
                                     <p class="mb-0">
-                                        <strong>Solde restant :</strong>
+                                        <strong>Leaves left :</strong>
                                         <span id="soldeRestant2" class="fw-bold text-primary">-</span>
                                     </p>
                                     <hr>
                                     <div class="d-grid gap-2">
                                         <button type="submit" form="formSimulation" class="btn btn-success" disabled
                                             id="submit1">
-                                            Planifier
+                                            Planify
                                         </button>
                                     </div>
                                 </div>
@@ -118,10 +118,10 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Annuler
+                    Cancel
                 </button>
                 <button type="button" class="btn btn-primary" id="simulateButton">
-                    Simuler
+                    Simulate
                 </button>
             </div>
 

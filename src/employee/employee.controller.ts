@@ -92,7 +92,7 @@ export class EmployeeController {
       const result = await this.employeeService.processExcelBuffer(file);
 
       // Redirection vers la liste des employés avec message
-      res.redirect(`/employee?message=${encodeURIComponent(result.message)}`);
+      res.redirect(`/leave/planning-view`);
     } catch (error) {
       // Gestion d'erreur
       console.log("ERROR:", error)

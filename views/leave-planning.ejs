@@ -22,8 +22,8 @@
                 <label for="lineFilter" class="ms-2">Line</label>
                 <select class="form-select" id="lineFilter">
                     <% lineList.forEach(line=> { %>
-                        <option value="<%= line %>">
-                            <%= line %>
+                        <option value="<%= line %>" <% if(line==='NULL' ) { %>selected<% } %>>
+                                <%= line %>
                         </option>
                         <% }) %>
                 </select>
@@ -32,15 +32,19 @@
                 <label for="lineFilter" class="ms-2">Departement</label>
                 <select class="form-select" id="departementFilter">
                     <% departementList.forEach(function(departement) { %>
-                        <option value="<%= departement %>">
-                            <%= departement %>
+                        <option value="<%= departement %>" <% if(departement==='HR' ) { %>selected<% } %>>
+                                <%= departement %>
                         </option>
                         <% }); %>
                 </select>
             </div>
-            <div class="col-md-3 mt-2">
-            </div>
-            <div class="col-md-3 mt-2 justify-content-end text-end">
+            <!-- <div class="col-md-3 mt-2">
+            </div> -->
+            <div class="col-md-6 mt-2 justify-content-end text-end">
+                <button type="button" class="btn btn-outline-primary mx-3" data-bs-toggle="modal"
+                    data-bs-target="#importModal">
+                    Import Employees
+                </button>
                 <button type="button" class="btn btn-primary mx-3" data-bs-toggle="modal"
                     data-bs-target="#simulationModal">
                     Local leave simulation
@@ -57,6 +61,8 @@
             <%- include('partials/simulate-leave-modal') %>
 
                 <%- include('partials/planning-calendar') %>
+
+                    <%- include('partials/import-modal') %>
 
     </div>
 

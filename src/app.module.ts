@@ -11,19 +11,26 @@ import { Employee } from './employee/entities/employee.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // ← rend les variables accessibles partout
+      isGlobal: true,
     }),
+    // TypeOrmModule.forRoot({
+    //   type: 'mysql',
+    //   host: 'localhost',
+    //   port: 3306,
+    //   username: 'root',
+    //   password: '',
+    //   // database: 'leave_planner_test',
+    //   database: 'leave_planner',
+    //   entities: [
+    //     Leave,
+    //     Employee
+    //   ],
+    //   synchronize: true,
+    // }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',      // Ton utilisateur MySQL
-      password: '',  // Ton mot de passe
-      database: 'leave_planner',   // Le nom de ta base de données
-      entities: [
-        Leave,
-        Employee
-      ],
+      type: 'sqlite',
+      database: 'database.sqlite',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     EmployeeModule,

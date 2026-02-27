@@ -66,6 +66,8 @@ export class EmployeeService {
     const employeeIds = employees.map(e => e.id);
     console.log("employeeIds:", employeeIds);
 
+    const today = new Date();
+
     // 2️⃣ Calcul jours pris (Local_Leave_AMD uniquement)
     const takenLeaves = await this.leaveRepository
       .createQueryBuilder('leave')
@@ -78,6 +80,7 @@ export class EmployeeService {
       .where('employee.id IN (:...employeeIds)', { employeeIds })
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
+      // .andWhere('leave.start_date <= :today', { today })
       .groupBy('employee.id')
       .getRawMany();
 
@@ -90,7 +93,7 @@ export class EmployeeService {
     });
 
     // 3️⃣ Calcul solde cumulatif dynamique
-    const today = new Date();
+    // const today = new Date();
 
     let soldeCumul = 0;
 

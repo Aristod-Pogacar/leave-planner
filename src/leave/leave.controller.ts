@@ -24,9 +24,9 @@ export class LeaveController {
     // res.redirect('/leave/new-leave');
   }
 
-  @Get('employee-leaves/:employeeId')
-  async getEmployeeLeaves(@Param('employeeId') employeeId: string, @Query() query: any) {
-    return this.leaveService.getEmployeeLeaves(employeeId);
+  @Get('employee-leaves/paginate/:employeeId')
+  async getEmployeeLeaves(@Param('employeeId') employeeId: string, @Query('skip') skip: number, @Query('take') take: number) {
+    return this.leaveService.getPaginateEmployeeLeaves(employeeId, skip, take);
   }
 
   @Get('employee-leaves/:employeeId/:month/:year')

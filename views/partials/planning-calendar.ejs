@@ -21,8 +21,8 @@
 
     const query = new URLSearchParams(window.location.search);
 
-    const defaultLine = query.get("line") || "L1";
-    const defaultDepartement = query.get("departement") || "FINISHING";
+    const defaultLine = query.get("line") || "NULL";
+    const defaultDepartement = query.get("departement") || "HR";
 
     let employees = [];
     let leaves = [];
@@ -93,9 +93,9 @@
         employeeColumn.innerHTML += `
   <div class="employee-row header-row">
     <div class="header-cell">EMPLOYEES</div>
-    <div class="header-cell">CUMULÉ</div>
-    <div class="header-cell">PRIS</div>
-    <div class="header-cell">RESTANT</div>
+    <div class="header-cell">CUMUL</div>
+    <div class="header-cell">TAKEN</div>
+    <div class="header-cell">LEFT</div>
   </div>
 `;
 
@@ -108,7 +108,7 @@
 
             employeeColumn.innerHTML += `
     <div class="employee-row">
-      <div class="employee-cell leave-bar-text">${emp.fullname}</div>
+      <div class="employee-cell leave-bar-text">${emp.matricule} - ${emp.fullname}</div>
       <div class="employee-cell text-center">${cumule}</div>
       <div class="employee-cell text-center">${prises}</div>
       <div class="employee-cell text-center">${restant}</div>
@@ -303,6 +303,8 @@
 
         const scrollLeft = datesContainer.scrollLeft;
         const maxScroll = datesContainer.scrollWidth - datesContainer.clientWidth;
+
+        employeeColumn.scrollTop = datesContainer.scrollTop;
 
         // 👉 Si on arrive à droite
         if (scrollLeft >= maxScroll - 5) {

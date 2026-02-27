@@ -162,8 +162,18 @@ export class LeaveService {
     return this.leaveRepository.delete(id);
   }
 
+  async getPaginateEmployeeLeaves(employeeId: string, skip: number = 0, take: number = 10) {
+    const [data, count] = await this.leaveRepository.findAndCount({
+      where: { employee: { id: employeeId } },
+      order: { start_date: 'DESC' },
+      skip,
+      take,
+    });
+    return { data, count };
+  }
+
   async getEmployeeLeaves(employeeId: string) {
-    return this.leaveRepository.find({ where: { employee: { id: employeeId } } });
+    return this.leaveRepository.find({ where: { employee: { id: employeeId } }, });
   }
 
   async getEmployeeLeavesByDate(employeeId: string, date: Date) {
