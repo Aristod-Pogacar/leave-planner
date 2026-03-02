@@ -8,6 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 import { Leave } from './leave/entities/leave.entity';
 import { Employee } from './employee/entities/employee.entity';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { MailService } from './mail/mail.service';
+import { AuthService } from './auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -37,8 +41,9 @@ import { UserModule } from './user/user.module';
     EmployeeModule,
     LeaveModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailService, AuthService, JwtService],
 })
 export class AppModule { }

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
 import * as express from 'express';
 import { EmployeeService } from 'src/employee/employee.service';
+import { SuperAdminGuard } from 'src/superadmin/superadmin.guard';
 
 @Controller('leave')
 export class LeaveController {
@@ -77,8 +78,6 @@ export class LeaveController {
     @Query('line') line: string,
     @Query('departement') departement: string,
   ) {
-    // console.log("LINE:", line);
-    // console.log("DEPARTEMENT:", departement);
     return this.leaveService.getLeavesByRange(year, startMonth, endMonth, line, departement);
   }
 
@@ -89,8 +88,6 @@ export class LeaveController {
     @Query('line') line: string,
     @Query('departement') departement: string,
   ) {
-    console.log("LINE:", line);
-    console.log("DEPARTEMENT:", departement);
     return this.leaveService.getLeavesByMonthAndLineAndDepartement(year, month, line, departement);
   }
 
@@ -109,25 +106,20 @@ export class LeaveController {
 
   @Post('simulate-cumul-balance')
   async getEmployeeCumulativeBalance(@Body('matricule') matricule: string, @Body('date') date: string) {
-    console.log("MATRICULE:", matricule);
-    console.log("DATE(string):", date);
-    console.log("DATE:", new Date(date).toISOString());
     const employee = await this.employeeService.findOneByMatricule(matricule);
-    console.log("Employee:", employee);
-    // return { OK: "OK" };
     return this.leaveService.getEmployeeCumulativeBalance(employee?.id, new Date(date));
   }
 
+  @UseGuards(SuperAdminGuard)
   @Get('planning-view')
   @Render('leave-planning')
   async planningView() {
     const departementList = await this.employeeService.findAllDepartments()
-    // console.log("departement:", departementList)
     const lineList = await this.employeeService.findAllLines()
-    // console.log("line:", lineList)
     return { pageTitle: "Planning View", departementList, lineList };
   }
 
+  @UseGuards(SuperAdminGuard)
   @Post()
   create(@Body() createLeaveDto: CreateLeaveDto, @Res() res: express.Response) {
     return this.leaveService.create(createLeaveDto, res);

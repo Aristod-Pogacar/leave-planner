@@ -162,6 +162,8 @@
     let hasMore = true;
     let currentEmployeeId = null;
 
+    var soldePermissionNumber = 0;
+
     const wrapper = document.getElementById("leaveHistoryWrapper");
     const tbody = document.getElementById("leaveHistoryBody");
 
@@ -244,6 +246,7 @@
                         soldeRestant.textContent = emp.solde_restant + " day(s)";
                         soldePermission.textContent = emp.permissions + " day(s)";
                         solde = emp.solde_restant;
+                        soldePermissionNumber = emp.permissions;
                         checkValableLeave();
                         results.innerHTML = '';
                         skip = 0;
@@ -380,6 +383,11 @@
             messageContainer.style.color = "red";
         } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays > solde) {
             message = "Solde left(" + solde + " days) is not enough for your request(" + numberOfDays + " days)";
+            submitButton.disabled = true;
+            messageContainer.innerHTML = message;
+            messageContainer.style.color = "red";
+        } else if (leaveType.value === 'Permission_AMD' && numberOfDays > soldePermissionNumber) {
+            message = "Solde left(" + soldePermissionNumber + " days) is not enough for your request(" + numberOfDays + " days)";
             submitButton.disabled = true;
             messageContainer.innerHTML = message;
             messageContainer.style.color = "red";
