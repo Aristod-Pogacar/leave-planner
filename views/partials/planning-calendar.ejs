@@ -175,6 +175,8 @@
                     const start_date = new Date(leave.start_date);
                     const end_date = new Date(leave.start_date);
                     const start_date_1 = new Date(start_date);
+                    const true_end_date = new Date(leave.end_date);
+                    true_end_date.setDate(true_end_date.getDate());
                     start_date_1.setDate(start_date.getDate() - 1);
                     cell.classList.add("day-cell");
                     if (leave.employee.id == emp.id && day >= start_date_1 && day <= end_date && leave.leave_type != "Medical_Leave_AMD") {
@@ -191,13 +193,12 @@
                             year: 'numeric'
                         }));
                         cell.setAttribute("data-bs-cell-type", "leave");
-                        start_date.setDate(start_date.getDate() + 1)
-                        end_date.setDate(end_date.getDate() + 1)
+                        // start_date.setDate(start_date.getDate() + 1)
                         cell.setAttribute("data-bs-leave", leave.leave_type + " (" + start_date.toLocaleDateString("fr-FR", {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'
-                        }) + " - " + end_date.toLocaleDateString("fr-FR", {
+                        }) + " - " + true_end_date.toLocaleDateString("fr-FR", {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'
@@ -210,11 +211,11 @@
                         wrapper.setAttribute("data-bs-title", emp.fullname);
                         wrapper.setAttribute("data-bs-html", "true");
                         wrapper.setAttribute("data-bs-content", `<b>Matricule:</b> ${emp.matricule}<br><b>Leave Type:</b> ${leave.leave_type}
-                            <br><b>Start Date:</b> ${start_date_1.toLocaleDateString('fr-FR', {
+                            <br><b>Start Date:</b> ${start_date.toLocaleDateString('fr-FR', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'
-                        })}<br><b>End Date:</b> ${end_date.toLocaleDateString('fr-FR', {
+                        })}<br><b>End Date:</b> ${true_end_date.toLocaleDateString('fr-FR', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric'

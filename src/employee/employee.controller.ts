@@ -50,7 +50,7 @@ export class EmployeeController {
     @Query('year') year: number = new Date().getFullYear(),
   ) {
     const employees = await this.employeeService.getEmployeesWithBalances(line, departement, +skip, +take, +year);
-    console.log("employees", employees);
+    // console.log("employees", employees);
     return employees;
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }

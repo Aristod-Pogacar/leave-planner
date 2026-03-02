@@ -64,9 +64,10 @@ export class EmployeeService {
     }
 
     const employeeIds = employees.map(e => e.id);
-    console.log("employeeIds:", employeeIds);
+    // console.log("employeeIds:", employeeIds);
 
     const today = new Date();
+    console.log("today:", today);
 
     // 2️⃣ Calcul jours pris (Local_Leave_AMD uniquement)
     const takenLeaves = await this.leaveRepository
@@ -80,11 +81,11 @@ export class EmployeeService {
       .where('employee.id IN (:...employeeIds)', { employeeIds })
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
-      // .andWhere('leave.start_date <= :today', { today })
+      .andWhere('leave.start_date <= :today', { today })
       .groupBy('employee.id')
       .getRawMany();
 
-    console.log("takenLeaves:", takenLeaves);
+    // console.log("takenLeaves:", takenLeaves);
 
     const takenMap = new Map<string, number>();
 
@@ -194,7 +195,7 @@ export class EmployeeService {
 
       const rows: any[] = XLSX.utils.sheet_to_json(worksheet);
       // const salt = await bcrypt.genSalt(10);
-      console.log("rows:", rows);
+      // console.log("rows:", rows);
 
       // 🎯 Sélectionner uniquement certains champs
       const filtered = rows.map(row => ({
@@ -351,6 +352,9 @@ export class EmployeeService {
       .take(10)
       .getManyAndCount();
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const takenLeaves = await this.leaveRepository
       .createQueryBuilder('leave')
       .leftJoin('leave.employee', 'employee')
@@ -362,6 +366,22 @@ export class EmployeeService {
       .where('employee.id IN (:...employeeIds)', { employeeIds: data.map((e) => e.id) })
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
+      .andWhere('leave.start_date <= :today', { today })
+      .groupBy('employee.id')
+      .getRawMany();
+
+    const takenPermissions = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id IN (:...employeeIds)', { employeeIds: data.map((e) => e.id) })
+      .andWhere('leave.leave_type = :type', { type: 'Permission_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year })
+      .andWhere('leave.start_date <= :today', { today })
       .groupBy('employee.id')
       .getRawMany();
     // console.log("Data:", takenLeaves);
@@ -369,15 +389,18 @@ export class EmployeeService {
 
     // console.log("takenLeaves:", takenLeaves);
 
-    const takenMap = new Map<string, number>();
+    const takenLeavesMap = new Map<string, number>();
+    const takenPermissionsMap = new Map<string, number>();
 
     takenLeaves.forEach(l => {
-      takenMap.set(l.employeeId, Number(l.daysTaken));
+      takenLeavesMap.set(l.employeeId, Number(l.daysTaken));
+    });
+
+    takenPermissions.forEach(l => {
+      takenPermissionsMap.set(l.employeeId, Number(l.daysTaken));
     });
 
     // 3️⃣ Calcul solde cumulatif dynamique
-    const today = new Date();
-
     let soldeCumul = 0;
 
     if (year < today.getFullYear()) {
@@ -401,7 +424,8 @@ export class EmployeeService {
 
     // 4️⃣ Fusion finale
     const result = data.map(emp => {
-      const pris = takenMap.get(emp.id) || 0;
+      const pris = takenLeavesMap.get(emp.id) || 0;
+      const permissions = takenPermissionsMap.get(emp.id) || 0;
       const restant = soldeCumul - pris;
 
       return {
@@ -409,6 +433,7 @@ export class EmployeeService {
         solde_cumul: Number(soldeCumul.toFixed(2)),
         solde_pris: Number(pris.toFixed(2)),
         solde_restant: Number(restant.toFixed(2)),
+        permissions: Number(permissions.toFixed(2)),
       };
     });
 

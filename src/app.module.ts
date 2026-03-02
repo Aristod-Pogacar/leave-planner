@@ -7,6 +7,7 @@ import { LeaveModule } from './leave/leave.module';
 import { ConfigModule } from '@nestjs/config';
 import { Leave } from './leave/entities/leave.entity';
 import { Employee } from './employee/entities/employee.entity';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { Employee } from './employee/entities/employee.entity';
     // }),
     EmployeeModule,
     LeaveModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

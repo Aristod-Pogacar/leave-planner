@@ -77,8 +77,8 @@ export class LeaveController {
     @Query('line') line: string,
     @Query('departement') departement: string,
   ) {
-    console.log("LINE:", line);
-    console.log("DEPARTEMENT:", departement);
+    // console.log("LINE:", line);
+    // console.log("DEPARTEMENT:", departement);
     return this.leaveService.getLeavesByRange(year, startMonth, endMonth, line, departement);
   }
 
@@ -122,9 +122,9 @@ export class LeaveController {
   @Render('leave-planning')
   async planningView() {
     const departementList = await this.employeeService.findAllDepartments()
-    console.log("departement:", departementList)
+    // console.log("departement:", departementList)
     const lineList = await this.employeeService.findAllLines()
-    console.log("line:", lineList)
+    // console.log("line:", lineList)
     return { pageTitle: "Planning View", departementList, lineList };
   }
 
