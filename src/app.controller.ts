@@ -71,4 +71,12 @@ export class AppController {
 
     return res.redirect('/');
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Get('logout')
+  async logout(@Req() req: any, @Res() res: any) {
+    req.session.destroy();
+    return res.redirect('/login');
+  }
 }
