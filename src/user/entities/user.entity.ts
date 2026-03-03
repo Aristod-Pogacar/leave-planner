@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 export enum UserRole {
     USER = 'USER',
     ADMIN = 'ADMIN',
+    PAYROLL = 'PAYROLL',
     SUPERADMIN = 'SUPERADMIN'
 }
 
@@ -13,13 +14,13 @@ export class User {
     id: string;
 
     @Column()
-    nom: string;
+    name: string;
 
     @Column({ nullable: true })
-    prenom: string;
+    firstName: string;
 
     @Column({ nullable: true })
-    telephone: string;
+    phone: string;
 
     @Column()
     email: string;

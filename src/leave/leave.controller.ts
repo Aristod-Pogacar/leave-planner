@@ -5,6 +5,9 @@ import { UpdateLeaveDto } from './dto/update-leave.dto';
 import * as express from 'express';
 import { EmployeeService } from 'src/employee/employee.service';
 import { SuperAdminGuard } from 'src/superadmin/superadmin.guard';
+import { RolesGuard } from 'src/user/role.guard';
+import { Roles } from 'src/user/role.decorator';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Controller('leave')
 export class LeaveController {
@@ -110,7 +113,8 @@ export class LeaveController {
     return this.leaveService.getEmployeeCumulativeBalance(employee?.id, new Date(date));
   }
 
-  @UseGuards(SuperAdminGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('planning-view')
   @Render('leave-planning')
   async planningView() {
@@ -119,7 +123,8 @@ export class LeaveController {
     return { pageTitle: "Planning View", departementList, lineList };
   }
 
-  @UseGuards(SuperAdminGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post()
   create(@Body() createLeaveDto: CreateLeaveDto, @Res() res: express.Response) {
     return this.leaveService.create(createLeaveDto, res);

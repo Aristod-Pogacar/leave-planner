@@ -4,15 +4,15 @@ import { UserRole } from "../entities/user.entity";
 export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
-    nom: string;
+    name: string;
 
     @IsString()
     @IsOptional()
-    prenom: string;
+    firstName: string;
 
     @IsString()
     @IsOptional()
-    telephone: string;
+    phone: string;
 
     @IsString()
     @IsNotEmpty()

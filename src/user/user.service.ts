@@ -15,7 +15,12 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) { }
   async create(createUserDto: CreateUserDto) {
-    return await this.userRepo.save(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = await this.userRepo.save({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+    return user;
   }
 
   async findAll() {

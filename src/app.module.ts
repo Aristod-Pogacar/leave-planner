@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { User } from './user/entities/user.entity';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { JwtService } from '@nestjs/jwt';
       database: 'leave_planner',
       entities: [
         Leave,
-        Employee
+        Employee,
+        User
       ],
       synchronize: true,
     }),
