@@ -13,6 +13,7 @@ import { MailService } from './mail/mail.service';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './user/entities/user.entity';
+import { EmployeeService } from './employee/employee.service';
 
 @Module({
   imports: [
@@ -46,6 +47,6 @@ import { User } from './user/entities/user.entity';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MailService, AuthService, JwtService],
+  providers: [AppService, MailService, AuthService, JwtService, EmployeeService],
 })
 export class AppModule { }

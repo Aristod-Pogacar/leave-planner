@@ -10,5 +10,6 @@ import { LeaveService } from "src/leave/leave.service";
   imports: [TypeOrmModule.forFeature([Leave, Employee])],
   controllers: [EmployeeController],
   providers: [EmployeeService, LeaveService],
+  exports: [EmployeeService, TypeOrmModule],
 })
 export class EmployeeModule { }

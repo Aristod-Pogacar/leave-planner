@@ -7,6 +7,7 @@ import { UserService } from './user/user.service';
 import { UserRole } from './user/entities/user.entity';
 import { RolesGuard } from './user/role.guard';
 import { Roles } from './user/role.decorator';
+import { EmployeeService } from './employee/employee.service';
 
 @Controller()
 export class AppController {
@@ -14,6 +15,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly employeeService: EmployeeService,
   ) { }
 
   @Get()
@@ -78,5 +80,12 @@ export class AppController {
   async logout(@Req() req: any, @Res() res: any) {
     req.session.destroy();
     return res.redirect('/login');
+  }
+
+  @Get("test")
+  async test(@Req() req: any, @Res() res: any) {
+    const departementList = await this.employeeService.findAllDepartments()
+    const lineList = await this.employeeService.findAllLines()
+    return res.render('all-leave', { departementList, lineList });
   }
 }
