@@ -4,7 +4,7 @@
 
         .planning-container {
             display: flex;
-            height: 75vh;
+            height: 60vh;
             border: 1px solid #ddd;
             background: white;
         }
@@ -212,5 +212,5 @@
         }
 
         thead {
-            width: calc(100% - 1em);
+            width: calc(100% - 0.3em);
         }

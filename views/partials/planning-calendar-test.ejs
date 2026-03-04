@@ -9,9 +9,9 @@
 </div>
 <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-    // const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
     const isoDate = new Date().toISOString().split("T")[0];
     const employeeColumn = document.getElementById("employeeColumn");
     const datesContainer = document.getElementById("datesContainer");
@@ -21,8 +21,8 @@
 
     const query = new URLSearchParams(window.location.search);
 
-    const defaultLine = "NULL";
-    const defaultDepartement = "HR";
+    const defaultLine = query.get("line") || "NULL";
+    const defaultDepartement = query.get("departement") || "HR";
 
     let employees = [];
     let leaves = [];
@@ -33,25 +33,25 @@
     const startMonth = new Date().getMonth() + 1;
     const endMonth = startMonth + 2;
 
-    // const lineElement = document.getElementById("lineFilter");
-    // const departementElement = document.getElementById("departementFilter");
+    const lineElement = document.getElementById("lineFilter");
+    const departementElement = document.getElementById("departementFilter");
 
-    // lineElement.addEventListener("change", loadPlanning);
-    // departementElement.addEventListener("change", loadPlanning);
+    lineElement.addEventListener("change", loadPlanning);
+    departementElement.addEventListener("change", loadPlanning);
 
     let firstTime = true;
 
     async function loadPlanning() {
 
-        var line = defaultLine;
-        var departement = defaultDepartement;
+        var line = lineElement.value || defaultLine;
+        var departement = departementElement.value || defaultDepartement;
 
         if (firstTime) {
             line = defaultLine;
             departement = defaultDepartement;
             firstTime = false;
-            // lineElement.value = defaultLine;
-            // departementElement.value = defaultDepartement;
+            lineElement.value = defaultLine;
+            departementElement.value = defaultDepartement;
         }
 
         const year = 2026;
@@ -187,11 +187,11 @@
                         cell.style.zIndex = z;
                         z++;
                         cell.setAttribute("data-bs-toggle", "popover");
-                        cell.setAttribute("data-bs-title", day.toLocaleDateString("fr-FR", {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                        }));
+                        // cell.setAttribute("data-bs-title", day.toLocaleDateString("fr-FR", {
+                        //     day: '2-digit',
+                        //     month: '2-digit',
+                        //     year: 'numeric'
+                        // }));
                         cell.setAttribute("data-bs-cell-type", "leave");
                         // start_date.setDate(start_date.getDate() + 1)
                         cell.setAttribute("data-bs-leave", leave.leave_type + " (" + start_date.toLocaleDateString("fr-FR", {
@@ -249,26 +249,26 @@
                 });
 
                 if (cell.getAttribute("data-bs-cell-type") == "leave") {
-                    // const tooltip = new bootstrap.Tooltip(cell, {
-                    //     title: "" + cell.getAttribute("data-bs-leave"),
-                    //     placement: "bottom",
-                    //     trigger: "hover focus",
-                    //     container: "body"
-                    // });
+                    const tooltip = new bootstrap.Tooltip(cell, {
+                        title: "" + cell.getAttribute("data-bs-leave"),
+                        placement: "bottom",
+                        trigger: "hover focus",
+                        container: "body"
+                    });
                 } else {
-                    // const tooltip = new bootstrap.Tooltip(cell, {
-                    //     title: day.toLocaleDateString('fr-FR', {
-                    //         day: '2-digit',
-                    //         month: '2-digit',
-                    //         year: 'numeric',
-                    //     }),
-                    //     placement: "bottom",
-                    //     trigger: "hover focus",
-                    //     container: "body"
-                    // });
-                    // cell.addEventListener('click', () => {
-                    //     tooltip.hide();
-                    // });
+                    const tooltip = new bootstrap.Tooltip(cell, {
+                        title: day.toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                        }),
+                        placement: "bottom",
+                        trigger: "hover focus",
+                        container: "body"
+                    });
+                    cell.addEventListener('click', () => {
+                        tooltip.hide();
+                    });
                 }
 
                 datesGrid.appendChild(cell);
@@ -380,8 +380,8 @@
 
     async function loadLeavesForRange(startDate, endDate) {
 
-        const line = defaultLine;
-        const departement = defaultDepartement;
+        const line = lineElement.value || defaultLine;
+        const departement = departementElement.value || defaultDepartement;
 
         const newYear = startDate.getFullYear();
         const newStartMonth = startDate.getMonth();

@@ -50,16 +50,16 @@ export class AppController {
     return res.redirect('/');
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('register')
   @Render('register')
   getRegister() {
     return { title: 'Register', UserRole: UserRole };
   }
 
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('register')
   async register(@Body() body, @Req() req: any, @Res() res: any) {
     if (body.password !== body.confirmPassword) {

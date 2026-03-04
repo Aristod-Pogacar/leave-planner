@@ -1,0 +1,330 @@
+<%- include('partials/head.ejs') %>
+
+    <body>
+        <%- include('partials/sidebar.ejs') %>
+            <%- include('partials/header.ejs') %>
+                <main class="nxl-container">
+                    <div class="nxl-content">
+                        <div class="page-header">
+                            <div class="page-header-left d-flex align-items-center">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Be-Leave</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Leaves</li>
+                                    <li class="breadcrumb-item">Simulate leave</li>
+                                </ul>
+                            </div>
+                            <div class="page-header-right ms-auto">
+                                <div class="page-header-right-items">
+                                    <div class="d-flex d-md-none">
+                                        <a href="javascript:void(0)" class="page-header-right-close-toggle">
+                                            <i class="feather-arrow-left me-2"></i>
+                                            <span>Back</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-md-none d-flex align-items-center">
+                                    <a href="javascript:void(0)" class="page-header-right-open-toggle">
+                                        <i class="feather-align-right fs-20"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- [ page-header ] end -->
+                        <div class="bg-white py-3 border-bottom rounded-0 p-md-0 mb-0">
+                            <div class="d-md-none d-flex align-items-center justify-content-between">
+                                <a href="javascript:void(0)" class="page-content-left-open-toggle">
+                                    <i class="feather-align-left fs-20"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- [ Main Content ] start -->
+                        <div class="main-content">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="overviewTab">
+                                    <div class="row">
+
+                                        <div class="col-xl-12">
+                                            <div class="card stretch stretch-full d-flex">
+                                                <div class="card-header">
+                                                    <h4 class="header">Simulate leave</h4>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+
+                                                        <!-- ===== LEFT: FORM ===== -->
+                                                        <div class="col-md-6 border-end">
+
+                                                            <!-- Recherche Employé -->
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Employee</label>
+                                                                <input type="text" class="form-control"
+                                                                    id="employeeSearch1" autocomplete="off"
+                                                                    placeholder="Search an employee...">
+                                                                <input type="text" class="input" name="employee"
+                                                                    id="employee1" hidden required>
+                                                                <input type="text" class="input" name="matricule"
+                                                                    id="matricule1" hidden required>
+                                                                <ul id="employeeResults1"
+                                                                    class="autocomplete-list ms-1 ps-0"></ul>
+                                                            </div>
+
+                                                            <!-- Type -->
+                                                            <div class="mb-3 d-none">
+                                                                <label class="form-label">Leave type</label>
+                                                                <select class="form-select" name="leave_type"
+                                                                    id="leave_type" <option value=" Local_Leave_AMD"
+                                                                    selected>Local
+                                                                    leave
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+
+                                                            <!-- Date début -->
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label">Starting date</label>
+                                                                    <input type="date" class="form-control"
+                                                                        name="start_date" id="startDate1">
+                                                                </div>
+
+                                                                <!-- Date fin -->
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label">Ending date</label>
+                                                                    <input type="date" class="form-control"
+                                                                        name="end_date" id="endDate1">
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Raison -->
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Remarks</label>
+                                                                <textarea class="form-control" name="reason1"
+                                                                    rows="3"></textarea>
+                                                            </div>
+                                                            <!-- <input type="submit" hidden> -->
+
+                                                        </div>
+
+                                                        <!-- ===== RIGHT: INFOS ===== -->
+                                                        <div class="col-md-6">
+
+                                                            <div class="card mb-3 shadow-sm">
+                                                                <div class="card-header text-center fw-bold">
+                                                                    Actual leave balance
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <p class="mb-2">
+                                                                        <strong>Cumulated leaves :</strong>
+                                                                        <span id="soldeCumule1">-</span>
+                                                                    </p>
+                                                                    <p class="mb-2">
+                                                                        <strong>Taken leaves :</strong>
+                                                                        <span id="soldePris1">-</span>
+                                                                    </p>
+                                                                    <p class="mb-0">
+                                                                        <strong>Leaves left :</strong>
+                                                                        <span id="soldeRestant1"
+                                                                            class="fw-bold text-primary">-</span>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="card mb-3 shadow-sm">
+                                                                <div class="card-header text-center fw-bold">
+                                                                    Simulated leave balance
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <p class="mb-2">
+                                                                        <strong>Cumulated leaves :</strong>
+                                                                        <span id="soldeCumule2">-</span>
+                                                                    </p>
+                                                                    <p class="mb-2">
+                                                                        <strong>Taken leaves :</strong>
+                                                                        <span id="soldePris2">-</span>
+                                                                    </p>
+                                                                    <p class="mb-0">
+                                                                        <strong>Leaves left :</strong>
+                                                                        <span id="soldeRestant2"
+                                                                            class="fw-bold text-primary">-</span>
+                                                                    </p>
+                                                                    <hr>
+                                                                    <div class="d-grid gap-2">
+                                                                        <button type="submit" form="formSimulation"
+                                                                            class="btn btn-success" disabled
+                                                                            id="submit1">
+                                                                            Planify
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12 text-center">
+                                                            <p id="message1" class="fw-bold"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card-footer">
+                                                    <button type="button" class="btn btn-primary" id="simulateButton">
+                                                        Simulate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%- include('partials/new-leave-modal-test') %>
+                        <%- include('partials/footer.ejs') %>
+    </body>
+
+    <script>
+        var message = "";
+
+        const input1 = document.getElementById('employeeSearch1');
+        const results1 = document.getElementById('employeeResults1');
+        const hiddenInput1 = document.getElementById('employee1');
+        const hiddenInputMatricule1 = document.getElementById('matricule1');
+        const reasonInput1 = document.getElementById('reason1');
+        const submitButton1 = document.getElementById('submit1');
+        const simulateButton = document.getElementById('simulateButton');
+        const formSimulation = document.getElementById('formSimulation');
+        const leaveType = document.getElementById('leave_type');
+
+        const startDate1 = document.getElementById('startDate1');
+        startDate1.value = new Date().toISOString().split("T")[0];
+        const endDate1 = document.getElementById('endDate1');
+        endDate1.value = new Date().toISOString().split("T")[0];
+        // const hiddenInput = document.getElementById('employee');
+
+        let timeout1 = null;
+        simulateButton.addEventListener('click', checkSimulationLeave);
+
+        const soldeCumule1 = document.getElementById('soldeCumule1');
+        const soldePris1 = document.getElementById('soldePris1');
+        const soldeRestant1 = document.getElementById('soldeRestant1');
+
+        const soldeCumule2 = document.getElementById('soldeCumule2');
+        const soldePris2 = document.getElementById('soldePris2');
+        const soldeRestant2 = document.getElementById('soldeRestant2');
+
+        let solde_simulate = 0;
+
+        input1.addEventListener('input', () => {
+            clearTimeout(timeout1);
+
+            const query = input1.value.trim();
+            if (query.length < 2) {
+                results1.innerHTML = '';
+                return;
+            }
+
+            timeout1 = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/employee/finding/search-list?q=${query}`);
+
+                    if (!res.ok) {
+                        console.error('HTTP error', res.status);
+                        return;
+                    }
+
+                    const data = await res.json();
+
+                    results1.innerHTML = '';
+                    data.forEach(emp => {
+                        const li = document.createElement('li');
+                        li.classList.add('list-group-item');
+                        // li.classList.add('autocomplete-list-item');
+                        li.textContent = `${emp.matricule} - ${emp.fullname}`;
+                        li.onclick = () => {
+                            input1.value = li.textContent;
+                            hiddenInput1.value = emp.id;
+                            hiddenInputMatricule1.value = emp.matricule;
+                            soldeCumule1.textContent = emp.solde_cumul;
+                            soldePris1.textContent = emp.solde_pris;
+                            soldeRestant1.textContent = emp.solde_restant;
+                            solde = emp.solde_restant;
+                            // checkSimulationLeave();
+                            results1.innerHTML = '';
+                        };
+                        results1.appendChild(li);
+                    });
+
+                } catch (err) {
+                    console.error('Autocomplete error:', err);
+                }
+            }, 300);
+        });
+
+        function checkSimulationLeave() {
+            console.log("Matricule:", hiddenInputMatricule1.value);
+            console.log("Date:", startDate1.value);
+            const simulation = fetch('/leave/simulate-cumul-balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    matricule: hiddenInputMatricule1.value,
+                    date: startDate1.value,
+                }),
+            }).then(res => res.json()).then(data => {
+                console.log("Data:", data);
+                solde_simulate = data.solde_restant;
+                solde_pris_simulate = data.solde_pris;
+                solde_cumule_simulate = data.solde_cumul;
+                const startDate = document.getElementById('startDate1').value;
+                const endDate = document.getElementById('endDate1').value;
+                const messageContainer = document.getElementById('message1');
+
+                soldeCumule2.textContent = solde_cumule_simulate;
+                soldePris2.textContent = solde_pris_simulate;
+                soldeRestant2.textContent = solde_simulate;
+                // const solde = document.getElementById('soldeRestant').textContent;
+                const numberOfDays = getNumberOfDays(startDate, endDate);
+                console.log("NUMBER OF DAYS:", numberOfDays)
+                if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
+                    submitButton1.disabled = true;
+                    messageContainer.innerHTML = "Date invalide";
+                    messageContainer.style.color = "red";
+                } else if ((solde === null || solde === undefined || solde === "")) {
+                    submitButton1.disabled = true;
+                    messageContainer.innerHTML = "Veuillez choisir un employé";
+                    messageContainer.style.color = "red";
+                } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays >= solde_simulate) {
+                    submitButton1.disabled = true;
+                    messageContainer.innerHTML = "Solde de congé: " + solde_simulate + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)";
+                    messageContainer.style.color = "red";
+                } else {
+                    submitButton1.disabled = false;
+                    messageContainer.style.color = "green";
+                    messageContainer.innerHTML = "Congé valable pour la demande de " + numberOfDays + " jours.";
+                }
+            });
+        }
+        function getNumberOfDays(startDateStr, endDateStr) {
+            const start = new Date(startDateStr);
+            const end = new Date(endDateStr);
+            const diffTime = end - start;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            return diffDays + 1;
+        }
+        function checkDate(startDate, endDate) {
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
+            if (startDateObj <= endDateObj) {
+                return true
+            } else {
+                return false
+            }
+        }
+    </script>
+
+    </html>
