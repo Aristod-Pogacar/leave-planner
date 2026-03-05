@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, Render, UseInterceptors, Res, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, Render, UseInterceptors, Res, Query, UseGuards } from '@nestjs/common';
 import express from 'express'; // ✅ SEULE VERSION CORRECTE
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { memoryStorage } from 'multer';
+import { RolesGuard } from 'src/user/role.guard';
+import { Roles } from 'src/user/role.decorator';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Controller('employee')
 export class EmployeeController {
@@ -69,12 +72,16 @@ export class EmployeeController {
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }
 
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('import-master-file')
   @Render('import-master-file')
   async importMasterFile() {
     return { pageTitle: "Import Master File" };
   }
 
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('import-master-file')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -100,6 +107,8 @@ export class EmployeeController {
     }
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.employeeService.create(createEmployeeDto);
@@ -115,11 +124,15 @@ export class EmployeeController {
     return this.employeeService.findOne(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
     return this.employeeService.update(id, updateEmployeeDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.employeeService.remove(id);

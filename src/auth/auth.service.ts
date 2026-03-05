@@ -56,6 +56,8 @@ export class AuthService {
             console.log('🔥 SUPERADMIN LOGGED IN 🔥');
             return {
                 id: 'superadmin',
+                firstName: 'Super',
+                name: 'Admin',
                 email: process.env.SUPERADMIN_EMAIL,
                 role: UserRole.SUPERADMIN,
                 isSuperAdmin: true,

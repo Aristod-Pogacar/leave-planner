@@ -8,6 +8,7 @@ import { UserRole } from './user/entities/user.entity';
 import { RolesGuard } from './user/role.guard';
 import { Roles } from './user/role.decorator';
 import { EmployeeService } from './employee/employee.service';
+import { AuthGuard } from './auth/auth.guard';
 
 @Controller()
 export class AppController {
@@ -18,24 +19,24 @@ export class AppController {
     private readonly employeeService: EmployeeService,
   ) { }
 
+  @UseGuards(AuthGuard)
   @Get()
   getHello(@Res() res: express.Response) {
     return res.redirect('/leave/planning-view');
   }
 
   @Get('login')
-  @Render('login')
   async getLogin(@Req() req: any, @Res() res: any) {
+
     if (req.session.user) {
       return res.redirect('/');
-    } else {
-      return { title: 'Login' };
     }
+
+    res.render('login', { title: 'Login' });
   }
 
   @Post('login')
   async login(@Body() body, @Req() req: any, @Res() res: any) {
-    console.log("PASSWORD:", body.password)
     const user = await this.authService.validateUser(
       body.email,
       body.password,
@@ -50,16 +51,18 @@ export class AppController {
     return res.redirect('/');
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  // @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('register')
   @Render('register')
-  getRegister() {
+  getRegister(): { title: string; UserRole: typeof UserRole; } {
     return { title: 'Register', UserRole: UserRole };
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  // @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('register')
   async register(@Body() body, @Req() req: any, @Res() res: any) {
     if (body.password !== body.confirmPassword) {
@@ -74,6 +77,7 @@ export class AppController {
     return res.redirect('/');
   }
 
+  @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('logout')
@@ -84,8 +88,8 @@ export class AppController {
 
   @Get("test")
   async test(@Req() req: any, @Res() res: any) {
-    const departementList = await this.employeeService.findAllDepartments()
-    const lineList = await this.employeeService.findAllLines()
-    return res.render('all-leave', { departementList, lineList });
+    // const departementList = await this.employeeService.findAllDepartments()
+    // const lineList = await this.employeeService.findAllLines()
+    return res.render('import-test');
   }
 }

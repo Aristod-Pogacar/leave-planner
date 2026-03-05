@@ -113,8 +113,8 @@ export class LeaveController {
     return this.leaveService.getEmployeeCumulativeBalance(employee?.id, new Date(date));
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('planning-view')
   @Render('leave-planning')
   async planningView() {
@@ -123,24 +123,24 @@ export class LeaveController {
     return { pageTitle: "Planning View", departementList, lineList };
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('new-leave-test')
   @Render('new-leave-test')
   async newLeaveView() {
     return { pageTitle: "New leave" };
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('simulate-leave')
   @Render('simulate-leave')
   async simulateLeave() {
     return { pageTitle: "Simulate leave" };
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post()
   create(@Body() createLeaveDto: CreateLeaveDto, @Res() res: express.Response) {
     return this.leaveService.create(createLeaveDto, res);

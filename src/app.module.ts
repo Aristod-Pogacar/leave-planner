@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +14,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './user/entities/user.entity';
 import { EmployeeService } from './employee/employee.service';
+import { SessionLocalsMiddleware } from './session-locals/session-locals.middleware';
 
 @Module({
   imports: [
@@ -49,4 +50,10 @@ import { EmployeeService } from './employee/employee.service';
   controllers: [AppController],
   providers: [AppService, MailService, AuthService, JwtService, EmployeeService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(SessionLocalsMiddleware)
+      .forRoutes('*');
+  }
+}
