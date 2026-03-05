@@ -74,9 +74,9 @@
                                                             <div class="mb-3 d-none">
                                                                 <label class="form-label">Leave type</label>
                                                                 <select class="form-select" name="leave_type"
-                                                                    id="leave_type" <option value=" Local_Leave_AMD"
-                                                                    selected>Local
-                                                                    leave
+                                                                    id="leave_type">
+                                                                    <option value="Local_Leave_AMD" selected>Local
+                                                                        leave
                                                                     </option>
                                                                 </select>
                                                             </div>
@@ -287,9 +287,15 @@
                 soldeCumule2.textContent = solde_cumule_simulate;
                 soldePris2.textContent = solde_pris_simulate;
                 soldeRestant2.textContent = solde_simulate;
+                console.log("SOLDE SIMULATE:", solde_simulate);
+                console.log("SOLDE PRIS:", solde_pris_simulate);
+                console.log("SOLDE CUMULE:", solde_cumule_simulate);
                 // const solde = document.getElementById('soldeRestant').textContent;
                 const numberOfDays = getNumberOfDays(startDate, endDate);
                 console.log("NUMBER OF DAYS:", numberOfDays)
+                if (numberOfDays > solde_simulate) {
+                    console.log("Solde de congé: " + solde_simulate + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)");
+                }
                 if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
                     submitButton1.disabled = true;
                     messageContainer.innerHTML = "Date invalide";
