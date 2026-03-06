@@ -17,15 +17,27 @@ export class LeaveController {
   ) { }
 
   @Get('new-leave')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Render('new-leave')
   async newLeave(@Query() query: any, @Query() error?: string) {
-    return { pageTitle: "New Leave", error: error ? error : null };
+    return { title: "New Leave", error: error ? error : null };
   }
 
   @Post('new-leave')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   async createNewLeave(@Body() createLeaveDto: CreateLeaveDto, @Res() res: express.Response) {
     const leave = await this.leaveService.create(createLeaveDto, res);
     // res.redirect('/leave/new-leave');
+  }
+
+  @Get('leave-history')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Render('leave-history')
+  async leaveHistory(@Query() query: any, @Query() error?: string) {
+    return { title: "Leave History", error: error ? error : null };
   }
 
   @Get('employee-leaves/paginate/:employeeId')
@@ -120,7 +132,7 @@ export class LeaveController {
   async planningView() {
     const departementList = await this.employeeService.findAllDepartments()
     const lineList = await this.employeeService.findAllLines()
-    return { pageTitle: "Planning View", departementList, lineList };
+    return { title: "Planning View", departementList, lineList };
   }
 
   @UseGuards(RolesGuard)
@@ -128,7 +140,7 @@ export class LeaveController {
   @Get('new-leave-test')
   @Render('new-leave-test')
   async newLeaveView() {
-    return { pageTitle: "New leave" };
+    return { title: "New leave" };
   }
 
   @UseGuards(RolesGuard)
@@ -136,7 +148,7 @@ export class LeaveController {
   @Get('simulate-leave')
   @Render('simulate-leave')
   async simulateLeave() {
-    return { pageTitle: "Simulate leave" };
+    return { title: "Simulate leave" };
   }
 
   @UseGuards(RolesGuard)

@@ -72,17 +72,17 @@ export class EmployeeController {
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('import-master-file')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Render('import-master-file')
   async importMasterFile() {
-    return { pageTitle: "Import Master File" };
+    return { title: "Import Master File" };
   }
 
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('import-master-file')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),

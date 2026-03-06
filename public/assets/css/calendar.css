@@ -166,17 +166,22 @@
             border: 1px solid #ddd;
             max-height: 200px;
             overflow-y: auto;
+            overflow-x: hidden;
             background: white;
             position: absolute;
             width: max-content;
             /* width: 95%; */
-            z-index: 1000;
+            z-index: 10000;
         }
 
         .autocomplete-list li {
             padding: 8px;
             cursor: pointer;
             width: 100%;
+        }
+
+        .bakaero {
+            overflow: hidden;
         }
 
         .autocomplete-list li:hover {

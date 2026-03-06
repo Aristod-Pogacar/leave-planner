@@ -12,7 +12,7 @@
                                 </div>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">Leaves</li>
-                                    <li class="breadcrumb-item">New leave</li>
+                                    <li class="breadcrumb-item">History</li>
                                 </ul>
                             </div>
                             <div class="page-header-right ms-auto">
@@ -48,7 +48,7 @@
                                         <div class="col-xl-12">
                                             <div class="card stretch stretch-full d-flex">
                                                 <div class="card-header">
-                                                    <h4 class="header">New leave</h4>
+                                                    <h4 class="header">Leave history</h4>
                                                 </div>
                                                 <div class="card-body">
 
@@ -56,66 +56,24 @@
                                                         <div class="row">
 
                                                             <!-- ===== LEFT: FORM ===== -->
-                                                            <div class="col-md-6 border-end">
-                                                                <form id="leaveForm" method="POST"
-                                                                    action="/leave/new-leave">
+                                                            <div class="col-md-12">
 
-                                                                    <!-- Recherche Employé -->
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Employee</label>
-                                                                        <input type="text" class="form-control"
-                                                                            id="employeeSearch" autocomplete="off"
-                                                                            placeholder="Search an employee...">
-                                                                        <input type="text" class="input" name="employee"
-                                                                            id="employee" hidden required>
-                                                                        <ul id="employeeResults"
-                                                                            class="autocomplete-list ms-1 ps-0"></ul>
-                                                                    </div>
+                                                                <!-- Recherche Employé -->
+                                                                <div class="mb-0">
+                                                                    <label class=" form-label">Employee</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="employeeSearch" autocomplete="off"
+                                                                        placeholder="Search an employee...">
+                                                                    <input type="text" class="input" name="employee"
+                                                                        id="employee" hidden required>
+                                                                    <ul id="employeeResults"
+                                                                        class="autocomplete-list ps-0 w-100 z-200">
+                                                                    </ul>
+                                                                </div>
 
-                                                                    <!-- Type -->
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Leave type</label>
-                                                                        <select class="form-select" name="leave_type"
-                                                                            id="leave_type">
-                                                                            <option value="Local_Leave_AMD" selected>
-                                                                                Local leave</option>
-                                                                            <option value="Permission_AMD">Permission
-                                                                            </option>
-                                                                            <option value="Indisponibilite_AMD">
-                                                                                Indisponibility</option>
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <!-- Date début -->
-                                                                    <div class="row">
-                                                                        <div class="col-md-6">
-                                                                            <label class="form-label">Starting
-                                                                                date</label>
-                                                                            <input type="date" class="form-control"
-                                                                                name="start_date" id="startDate">
-                                                                        </div>
-
-                                                                        <!-- Date fin -->
-                                                                        <div class="col-md-6">
-                                                                            <label class="form-label">Ending
-                                                                                date</label>
-                                                                            <input type="date" class="form-control"
-                                                                                name="end_date" id="endDate">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <!-- Raison -->
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Remarks</label>
-                                                                        <textarea class="form-control" name="reason"
-                                                                            rows="3"></textarea>
-                                                                    </div>
-
-                                                                </form>
                                                             </div>
-
                                                             <!-- ===== RIGHT: INFOS ===== -->
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-6 d-none">
 
                                                                 <div class="card mb-3 shadow-sm">
                                                                     <div class="card-header text-center fw-bold">
@@ -169,22 +127,20 @@
                                                             </div>
 
                                                         </div>
-                                                        <div class="row mt-2">
+                                                        <div class="row mt-2 d-none">
                                                             <div class="col-md-12 text-center">
                                                                 <p id="message" class="fw-bold"></p>
                                                             </div>
                                                         </div>
                                                         <div class="row mt-4">
-                                                            <div class="col-12 border-top pt-3">
-                                                                <h5 class="fw-bold mb-3 text-center">Employee Leave
-                                                                    History</h5>
+                                                            <div class="col-12 pt-3">
                                                                 <div class="table-responsive"
-                                                                    style="max-height: 300px; overflow-y: auto;"
+                                                                    style="height: 300px; overflow-y: auto;"
                                                                     id="leaveHistoryWrapper">
                                                                     <table
                                                                         class="table table-sm table-hover table-bordered align-middle"
                                                                         id="leaveHistoryTable">
-                                                                        <thead class="table-light sticky-top">
+                                                                        <thead class="table-light z-100 w-100">
                                                                             <tr>
                                                                                 <th>Range</th>
                                                                                 <th>Start Date</th>
@@ -195,7 +151,7 @@
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody id="leaveHistoryBody"
-                                                                            class="leave-history-body">
+                                                                            class="leave-history-body-2">
                                                                         </tbody>
                                                                     </table>
                                                                 </div>
@@ -205,12 +161,6 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="card-footer">
-                                                    <button type="submit" form="leaveForm" class="btn btn-primary"
-                                                        id="submit">
-                                                        Save
-                                                    </button>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -218,8 +168,7 @@
                             </div>
                         </div>
                     </div>
-                    <%- include('partials/new-leave-modal-test') %>
-                        <%- include('partials/footer.ejs') %>
+                    <%- include('partials/footer.ejs') %>
     </body>
     <script>
 
@@ -240,28 +189,13 @@
         const input = document.getElementById('employeeSearch');
         const results = document.getElementById('employeeResults');
         const hiddenInput = document.getElementById('employee');
-        const submitButton = document.getElementById('submit');
         let timeout = null;
 
-        const startDate = document.getElementById('startDate');
-        startDate.value = new Date().toISOString().split("T")[0];
-        const endDate = document.getElementById('endDate');
-        endDate.value = new Date().toISOString().split("T")[0];
+        // const startDate = document.getElementById('startDate');
+        // startDate.value = new Date().toISOString().split("T")[0];
+        // const endDate = document.getElementById('endDate');
+        // endDate.value = new Date().toISOString().split("T")[0];
         // const hiddenInput = document.getElementById('employee');
-
-        const leaveType = document.getElementById('leave_type');
-        leaveType.addEventListener('change', () => {
-            if (leaveType.value === 'Local_Leave_AMD') {
-                checkValableLeave()
-            } else {
-                submitButton.disabled = false;
-                message = "";
-                document.getElementById('message').textContent = "";
-            }
-        })
-
-        startDate.addEventListener('change', checkValableLeave);
-        endDate.addEventListener('change', checkValableLeave);
 
         const fullname = document.getElementById('fullname');
         const matricule = document.getElementById('matricule');
@@ -316,7 +250,6 @@
                             soldePermission.textContent = emp.permissions + " day(s)";
                             solde = emp.solde_restant;
                             soldePermissionNumber = emp.permissions;
-                            checkValableLeave();
                             results.innerHTML = '';
                             skip = 0;
                             hasMore = true;
@@ -433,60 +366,6 @@
                 loadEmployeeLeaves();
             }
         });
-        function checkValableLeave() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const messageContainer = document.getElementById('message');
-            // const solde = document.getElementById('soldeRestant').textContent;
-            const numberOfDays = getNumberOfDays(startDate, endDate);
-            const soldePermissionDispo = 10 - soldePermissionNumber;
-            console.log("NUMBER OF DAYS:", numberOfDays)
-            if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
-                message = "Invalide date";
-                submitButton.disabled = true;
-                messageContainer.innerHTML = message;
-                messageContainer.style.color = "red";
-            } else if ((solde === null || solde === undefined || solde === "")) {
-                message = "Choose an employee";
-                submitButton.disabled = true;
-                messageContainer.innerHTML = message;
-                messageContainer.style.color = "red";
-            } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays > solde) {
-                message = "Solde left(" + solde + " days) is not enough for your request(" + numberOfDays + " days)";
-                submitButton.disabled = true;
-                messageContainer.innerHTML = message;
-                messageContainer.style.color = "red";
-            } else if (leaveType.value === 'Permission_AMD' && numberOfDays > soldePermissionDispo) {
-                message = "Solde left(" + soldePermissionDispo + " days) is not enough for your request(" + numberOfDays + " days)";
-                submitButton.disabled = true;
-                messageContainer.innerHTML = message;
-                messageContainer.style.color = "red";
-            } else {
-                submitButton.disabled = false;
-                message = "Your request is possible";
-                messageContainer.style.color = "green";
-                document.getElementById('message').textContent = message;
-            }
-        }
-        function getNumberOfDays(startDateStr, endDateStr) {
-            const start = new Date(startDateStr);
-            const end = new Date(endDateStr);
-            const diffTime = end - start;
-            const diffDays = diffTime / (1000 * 60 * 60 * 24);
-            return diffDays + 1;
-        }
-        function checkDate(startDate, endDate) {
-            // const today = new Date();
-            // today.setHours(0, 0, 0, 0);
-            const startDateObj = new Date(startDate);
-            const endDateObj = new Date(endDate);
-            // if (startDateObj <= endDateObj && startDateObj >= today) {
-            if (startDateObj <= endDateObj) {
-                return true
-            } else {
-                return false
-            }
-        }
     </script>
 
     </html>

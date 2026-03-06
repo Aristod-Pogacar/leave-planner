@@ -87,10 +87,31 @@ export class EmployeeService {
 
     // console.log("takenLeaves:", takenLeaves);
 
-    const takenMap = new Map<string, number>();
+    const takenPermissions = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id IN (:...employeeIds)', { employeeIds })
+      .andWhere('leave.leave_type = :type', { type: 'Permission_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year })
+      .andWhere('leave.start_date <= :today', { today })
+      .groupBy('employee.id')
+      .getRawMany();
+
+    const takenLeaveMap = new Map<string, number>();
 
     takenLeaves.forEach(l => {
-      takenMap.set(l.employeeId, Number(l.daysTaken));
+      takenLeaveMap.set(l.employeeId, Number(l.daysTaken));
+    });
+
+    const takenPermissionMap = new Map<string, number>();
+
+    takenPermissions.forEach(l => {
+      takenPermissionMap.set(l.employeeId, Number(l.daysTaken));
     });
 
     // 3️⃣ Calcul solde cumulatif dynamique
@@ -119,13 +140,15 @@ export class EmployeeService {
 
     // 4️⃣ Fusion finale
     const result = employees.map(emp => {
-      const pris = takenMap.get(emp.id) || 0;
+      const pris = takenLeaveMap.get(emp.id) || 0;
+      const prisPermission = takenPermissionMap.get(emp.id) || 0;
       const restant = soldeCumul - pris;
 
       return {
         ...emp,
         solde_cumul: Number(soldeCumul.toFixed(2)),
         solde_pris: Number(pris.toFixed(2)),
+        solde_pris_permission: Number(prisPermission.toFixed(2)),
         solde_restant: Number(restant.toFixed(2)),
       };
     });
@@ -286,14 +309,6 @@ export class EmployeeService {
 
     for (let i = 2; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
-
-      // console.log("DATE OF BIRTH:", row.getCell(headerMap['d.o.b']).value?.toString());
-      // console.log("DOE:", row.getCell(headerMap['d.o.e']).value?.toString());
-      // console.log("DOC:", row.getCell(headerMap['d.o.c']).value?.toString());
-      // console.log("DOR:", row.getCell(headerMap['d.o.r']).value?.toString());
-      // console.log("EFFECTIVE START DATE:", row.getCell(headerMap['effec. start date']).value?.toString());
-      // console.log("EFFECTIVE END DATE:", row.getCell(headerMap['effec. end date']).value?.toString());
-      // console.log("EMP NO:", row.getCell(headerMap['emp no']).value?.toString());
 
       employees.push({
         type: row.getCell(headerMap['type']).value?.toString(),

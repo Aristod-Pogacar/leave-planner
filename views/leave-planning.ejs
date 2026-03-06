@@ -44,54 +44,65 @@
                             <div class="tab-content">
                                 <div class="tab-pane fade active show" id="overviewTab">
                                     <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="card stretch stretch-full">
-                                                <div
-                                                    class="card-body task-header d-md-flex align-items-center justify-content-between">
-                                                    <div class="me-4 w-50">
-                                                        <div class="d-flex align-items-center">
-                                                            <label for="lineFilter"
-                                                                class="form-label ms-3">Line:</label>
-                                                            <select class="form-select mx-3" name="lineFilter"
-                                                                id="lineFilter">
-                                                                <% lineList.forEach(line=> { %>
-                                                                    <option value="<%= line %>" <% if(line==='NULL' ) {
-                                                                        %>
-                                                                        selected<% } %>>
-                                                                            <%= line %>
-                                                                    </option>
-                                                                    <% }) %>
-                                                            </select>
-                                                            <label for="departementFilter"
-                                                                class="form-label ms-3">Departement:</label>
-                                                            <select class="form-select mx-3" name="departementFilter"
-                                                                id="departementFilter">
-                                                                <% departementList.forEach(function(departement) { %>
-                                                                    <option value="<%= departement %>" <%
-                                                                        if(departement==='HR' ) { %>selected<% } %>>
-                                                                            <%= departement %>
-                                                                    </option>
-                                                                    <% }); %>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mt-4 mt-md-0">
-                                                        <div class="d-flex gap-2">
-                                                            <a href="/leave/new-leave" class="btn btn-success"
-                                                                title="New leave">
-                                                                <i class="feather-plus me-2"></i>
-                                                                <span>New Leave</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="col-xl-12">
                                             <div class="card stretch stretch-full d-flex">
                                                 <div class="card-header">
-                                                    <h4 class="header">Leave Plan</h4>
+                                                    <div class="row w-100">
+                                                        <div class="col-md-2">
+                                                            <h4 class="header">Leave Plan</h4>
+                                                        </div>
+                                                        <div
+                                                            class="col-10 task-header d-md-flex align-items-center justify-content-between">
+                                                            <div class="me-4 w-75">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="lineFilter"
+                                                                        class="form-label ms-3">Line:</label>
+                                                                    <select class="form-select mx-3" name="lineFilter"
+                                                                        id="lineFilter">
+                                                                        <% lineList.forEach(line=> { %>
+                                                                            <% if (line==='NULL' ) { %>
+                                                                                <option value="<%= line %>" selected>
+                                                                                    <%= line %>
+                                                                                </option>
+                                                                                <% } else { %>
+                                                                                    <option value="<%= line %>">
+                                                                                        <%= line %>
+                                                                                    </option>
+                                                                                    <% } %>
+                                                                                        <% }) %>
+                                                                    </select>
+                                                                    <label for="departementFilter"
+                                                                        class="form-label ms-3">Departement:</label>
+                                                                    <select class="form-select mx-3"
+                                                                        name="departementFilter" id="departementFilter">
+                                                                        <% departementList.forEach(function(departement)
+                                                                            { %>
+                                                                            <% if(departement==='HR' ) { %>
+                                                                                <option value="<%= departement %>"
+                                                                                    selected>
+                                                                                    <%= departement %>
+                                                                                </option>
+                                                                                <% } else { %>
+                                                                                    <option value="<%= departement %>">
+                                                                                        <%= departement %>
+                                                                                    </option>
+                                                                                    <% } %>
+                                                                                        <% }); %>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="">
+                                                                <div class="d-flex gap-2">
+                                                                    <a href="/leave/new-leave" class="btn btn-success"
+                                                                        title="New leave">
+                                                                        <i class="feather-plus me-2"></i>
+                                                                        <span>New Leave</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="card-body">
                                                     <%- include('partials/planning-calendar') %>

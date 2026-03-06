@@ -90,6 +90,6 @@ export class AppController {
   async test(@Req() req: any, @Res() res: any) {
     // const departementList = await this.employeeService.findAllDepartments()
     // const lineList = await this.employeeService.findAllLines()
-    return res.render('import-test');
+    return res.render('import-test', { title: 'Test' });
   }
 }
