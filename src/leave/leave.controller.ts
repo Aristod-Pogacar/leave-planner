@@ -18,7 +18,7 @@ export class LeaveController {
 
   @Get('new-leave')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Render('new-leave')
   async newLeave(@Query() query: any, @Query() error?: string) {
     return { title: "New Leave", error: error ? error : null };
@@ -26,7 +26,7 @@ export class LeaveController {
 
   @Post('new-leave')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   async createNewLeave(@Body() createLeaveDto: CreateLeaveDto, @Res() res: express.Response) {
     const leave = await this.leaveService.create(createLeaveDto, res);
     // res.redirect('/leave/new-leave');
@@ -34,7 +34,7 @@ export class LeaveController {
 
   @Get('leave-history')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
   @Render('leave-history')
   async leaveHistory(@Query() query: any, @Query() error?: string) {
     return { title: "Leave History", error: error ? error : null };
@@ -126,7 +126,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
   @Get('planning-view')
   @Render('leave-planning')
   async planningView() {
@@ -136,7 +136,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.SUPERADMIN)
   @Get('new-leave-test')
   @Render('new-leave-test')
   async newLeaveView() {
@@ -144,11 +144,11 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
   @Get('simulate-leave')
   @Render('simulate-leave')
   async simulateLeave() {
-    return { title: "Simulate leave" };
+    return { title: "Simulate leave", userRole: UserRole };
   }
 
   @UseGuards(RolesGuard)

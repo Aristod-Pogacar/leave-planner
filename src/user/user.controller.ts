@@ -1,11 +1,84 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, UseGuards, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { UserRole } from './entities/user.entity';
+import { RolesGuard } from './role.guard';
+import { Roles } from './role.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) { }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Get('list')
+  @Render('users')
+  async getList() {
+    return {
+      users: await this.userService.findAll(),
+      title: 'Users',
+      userRole: UserRole
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Get('new-user')
+  @Render('new-user')
+  async getNewUser() {
+    return {
+      title: 'New user',
+      userRole: UserRole
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Get('delete-user/:id')
+  @Render('delete-user')
+  async deleteUser(@Param('id') id: string) {
+    return {
+      title: 'Delete user',
+      userRole: UserRole,
+      users: await this.userService.findOne(id)
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Post('delete-user/:id')
+  async deleteTheUser(@Param('id') id: string, @Res() res: any) {
+    this.userService.remove(id);
+    return res.redirect('/user/list');
+  }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Get('edit-user/:id')
+  @Render('edit-user')
+  async editUser(@Param('id') id: string) {
+    return {
+      title: 'Edit user',
+      userRole: UserRole,
+      users: await this.userService.findOne(id)
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Post('edit-user/:id')
+  async editTheUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Res() res: any) {
+    this.userService.update(id, updateUserDto);
+    return res.redirect('/user/list');
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {

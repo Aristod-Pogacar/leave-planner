@@ -94,11 +94,13 @@
                                                             </div>
                                                             <div class="">
                                                                 <div class="d-flex gap-2">
-                                                                    <a href="/leave/new-leave" class="btn btn-success"
-                                                                        title="New leave">
-                                                                        <i class="feather-plus me-2"></i>
-                                                                        <span>New Leave</span>
-                                                                    </a>
+                                                                    <% if(user.role !=="USER" ) { %>
+                                                                        <a href="/leave/new-leave"
+                                                                            class="btn btn-success" title="New leave">
+                                                                            <i class="feather-plus me-2"></i>
+                                                                            <span>New Leave</span>
+                                                                        </a>
+                                                                        <% } %>
                                                                 </div>
                                                             </div>
                                                         </div>

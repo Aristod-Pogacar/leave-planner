@@ -1,0 +1,153 @@
+<%- include('partials/head.ejs') %>
+
+    <body>
+        <%- include('partials/sidebar.ejs') %>
+            <%- include('partials/header.ejs') %>
+                <main class="nxl-container">
+                    <div class="nxl-content">
+                        <div class="page-header">
+                            <div class="page-header-left d-flex align-items-center">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Be-Leave</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Users</li>
+                                    <li class="breadcrumb-item">Edit user</li>
+                                </ul>
+                            </div>
+                            <div class="page-header-right ms-auto">
+                                <div class="page-header-right-items">
+                                    <div class="d-flex d-md-none">
+                                        <a href="javascript:void(0)" class="page-header-right-close-toggle">
+                                            <i class="feather-arrow-left me-2"></i>
+                                            <span>Back</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-md-none d-flex align-items-center">
+                                    <a href="javascript:void(0)" class="page-header-right-open-toggle">
+                                        <i class="feather-align-right fs-20"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- [ page-header ] end -->
+                        <div class="bg-white py-3 border-bottom rounded-0 p-md-0 mb-0">
+                            <div class="d-md-none d-flex align-items-center justify-content-between">
+                                <a href="javascript:void(0)" class="page-content-left-open-toggle">
+                                    <i class="feather-align-left fs-20"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- [ Main Content ] start -->
+                        <div class="main-content">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="overviewTab">
+                                    <div class="row">
+
+                                        <div class="col-12">
+                                            <div class="card stretch stretch-full d-flex">
+                                                <div class="card-header">
+                                                    <h4 class="header">Edit user</h4>
+                                                </div>
+                                                <div class="card-body">
+
+                                                    <div class="modal-body">
+                                                        <div class="row">
+
+                                                            <!-- ===== LEFT: FORM ===== -->
+                                                            <div class="col-12">
+                                                                <form id="userForm" method="POST"
+                                                                    action="/user/edit-user/<%= users.id %>">
+
+                                                                    <!-- Recherche Employé -->
+                                                                    <div class="">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6 mb-3">
+                                                                                <label class="form-label">Name</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="name" name="name"
+                                                                                    placeholder="Enter your name"
+                                                                                    value="<%= users.name %>" required>
+                                                                            </div>
+                                                                            <div class="col-md-6 mb-3">
+                                                                                <label class="form-label">First
+                                                                                    name</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="firstName" name="firstName"
+                                                                                    placeholder="Enter your first name"
+                                                                                    value="<%= users.firstName %>"
+                                                                                    required>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Recherche Employé -->
+                                                                    <div class="">
+                                                                        <div class="row">
+                                                                            <div class="col-md-4 mb-3">
+                                                                                <label class="form-label">Phone
+                                                                                    number</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="phone" name="phone"
+                                                                                    placeholder="Enter your phone number"
+                                                                                    value="<%= users.phone %>" required>
+                                                                            </div>
+                                                                            <div class="col-md-4 mb-3">
+                                                                                <label class="form-label">Email</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="email" name="email"
+                                                                                    placeholder="exemple@mail.com"
+                                                                                    value="<%= users.email %>" required
+                                                                                    disabled>
+                                                                            </div>
+                                                                            <div class="col-md-4 mb-3">
+                                                                                <label class="form-label">Role</label>
+                                                                                <select class="form-control" id="role"
+                                                                                    name="role" required>
+                                                                                    <%
+                                                                                        Object.keys(userRole).forEach(key=>
+                                                                                        { %>
+                                                                                        <% if(userRole[key]
+                                                                                            !==userRole.SUPERADMIN) { %>
+                                                                                            <option
+                                                                                                value="<%= userRole[key] %>"
+                                                                                                <%
+                                                                                                if(userRole[key]===users.role)
+                                                                                                { %>
+                                                                                                selected <% } %>>
+                                                                                                    <%= userRole[key] %>
+                                                                                            </option>
+                                                                                            <% } %>
+                                                                                                <% }) %>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </form>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="card-footer">
+                                                    <button type="submit" form="userForm" class="btn btn-primary"
+                                                        id="submit">
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%- include('partials/new-leave-modal-test') %>
+                        <%- include('partials/footer.ejs') %>
+    </body>
+
+    </html>

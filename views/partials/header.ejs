@@ -43,13 +43,20 @@
                                 <div>
                                     <h6 class="text-dark mb-0">
                                         <%= user.firstName %>
-                                            <%= user.name %> <span class="badge bg-soft-success text-success ms-1">
-                                                    <%= user.role %>
-                                                </span>
+                                            <%= user.name %>
                                     </h6>
                                     <span class="fs-12 fw-medium text-muted">
                                         <%= user.email %>
                                     </span>
+                                    <h6>
+                                        <% var i=2; var roleColor="primary" ; if (user.role=="SUPERADMIN" ) {
+                                            roleColor="danger" } else if (user.role=="ADMIN" ) { roleColor="warning" }
+                                            else if (user.role=="PAYROLL" ) { roleColor="info" } else if
+                                            (user.role=="USER" ) { roleColor="primary" } %>
+                                            <span class="badge bg-soft-<%= roleColor %> text-<%= roleColor %> ms-1">
+                                                <%= user.role %>
+                                            </span>
+                                    </h6>
                                 </div>
                             </div>
                         </div>

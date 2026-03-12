@@ -249,12 +249,12 @@
                 });
 
                 if (cell.getAttribute("data-bs-cell-type") == "leave") {
-                    const tooltip = new bootstrap.Tooltip(cell, {
-                        title: "" + cell.getAttribute("data-bs-leave"),
-                        placement: "bottom",
-                        trigger: "hover focus",
-                        container: "body"
-                    });
+                    // const tooltip = new bootstrap.Tooltip(cell, {
+                    //     title: "" + cell.getAttribute("data-bs-leave"),
+                    //     placement: "bottom",
+                    //     trigger: "hover focus",
+                    //     container: "body"
+                    // });
                 } else {
                     const tooltip = new bootstrap.Tooltip(cell, {
                         title: day.toLocaleDateString('fr-FR', {

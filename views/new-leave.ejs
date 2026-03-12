@@ -174,7 +174,7 @@
                                                                 <p id="message" class="fw-bold"></p>
                                                             </div>
                                                         </div>
-                                                        <div class="row mt-4">
+                                                        <!-- <div class="row mt-4">
                                                             <div class="col-12 border-top pt-3">
                                                                 <h5 class="fw-bold mb-3 text-center">Employee Leave
                                                                     History</h5>
@@ -200,7 +200,7 @@
                                                                     </table>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </div> -->
 
                                                     </div>
                                                 </div>
@@ -232,8 +232,8 @@
 
         var soldePermissionNumber = 0;
 
-        const wrapper = document.getElementById("leaveHistoryWrapper");
-        const tbody = document.getElementById("leaveHistoryBody");
+        // const wrapper = document.getElementById("leaveHistoryWrapper");
+        // const tbody = document.getElementById("leaveHistoryBody");
 
         var message = "";
 
@@ -320,8 +320,8 @@
                             results.innerHTML = '';
                             skip = 0;
                             hasMore = true;
-                            tbody.innerHTML = "";
-                            loadEmployeeLeaves(emp.id);
+                            // tbody.innerHTML = "";
+                            // loadEmployeeLeaves(emp.id);
                             // const historyResponse = await fetch(`/leave/employee-leaves/paginate/${emp.id}?skip=0&take=10`);
                             // const historyData = await historyResponse.json();
                             console.log("soldePermissionNumber:", soldePermissionNumber);
@@ -356,7 +356,7 @@
                     hasMore = false;
                 }
 
-                appendLeavesToTable(data.data);
+                // appendLeavesToTable(data.data);
 
                 skip += take;
 
@@ -372,67 +372,68 @@
             return new Date(dateString).toLocaleDateString("fr-FR");
         }
 
-        function appendLeavesToTable(leaves) {
-            var i = 1;
+        // function appendLeavesToTable(leaves) {
+        //     var i = 1;
 
-            leaves.forEach(leave => {
+        //     leaves.forEach(leave => {
 
-                const row = document.createElement("tr");
-                var status = "waiting";
-                var statusClass = "bg-primary";
-                const today = new Date();
-                const startDate = new Date(leave.start_date);
-                startDate.setHours(0, 0, 0, 0);
-                const endDate = new Date(leave.end_date);
-                endDate.setHours(23, 59, 59, 999);
+        //         const row = document.createElement("tr");
+        //         var status = "waiting";
+        //         var statusClass = "bg-primary";
+        //         const today = new Date();
+        //         const startDate = new Date(leave.start_date);
+        //         startDate.setHours(0, 0, 0, 0);
+        //         const endDate = new Date(leave.end_date);
+        //         endDate.setHours(23, 59, 59, 999);
 
-                if (today >= startDate && today <= endDate) {
-                    status = "in progress";
-                    statusClass = "bg-success";
-                } else if (today > endDate) {
-                    status = "finished";
-                    statusClass = "bg-danger";
-                }
+        //         if (today >= startDate && today <= endDate) {
+        //             status = "in progress";
+        //             statusClass = "bg-success";
+        //         } else if (today > endDate) {
+        //             status = "finished";
+        //             statusClass = "bg-danger";
+        //         }
 
-                var leaveTypeClass = "";
-                if (leave.leave_type === "Local_Leave_AMD") {
-                    leaveTypeClass = "bg-soft-primary text-primary";
-                } else if (leave.leave_type === "Permission_AMD") {
-                    leaveTypeClass = "bg-soft-success text-success";
-                } else if (leave.leave_type === "Indisponibilite_AMD") {
-                    leaveTypeClass = "bg-soft-danger text-danger";
-                }
+        //         var leaveTypeClass = "";
+        //         if (leave.leave_type === "Local_Leave_AMD") {
+        //             leaveTypeClass = "bg-soft-primary text-primary";
+        //         } else if (leave.leave_type === "Permission_AMD") {
+        //             leaveTypeClass = "bg-soft-success text-success";
+        //         } else if (leave.leave_type === "Indisponibilite_AMD") {
+        //             leaveTypeClass = "bg-soft-danger text-danger";
+        //         }
 
-                row.innerHTML = `
-                                        <td class="text-center text-muted py-3">${i}
-                                        </td>
-                                        <td class="text-center text-muted py-3">${formatDate(leave.start_date)}
-                                        </td>
-                                        <td class="text-center text-muted py-3">${formatDate(leave.end_date)}
-                                        </td>
-                                        <td class="text-center text-muted py-3">
-                                            <span class="badge ${leaveTypeClass}">${leave.leave_type}</span>
-                                        </td>
-                                        <td class="text-center text-muted py-3">${leave.duration} day(s)
-                                        </td>
-                                        <td class="text-center py-3">
-                                            <span class="badge ${statusClass}">${status}</span>
-                                        </td>
-        `;
+        //         row.innerHTML = `
+        //                                 <td class="text-center text-muted py-3">${i}
+        //                                 </td>
+        //                                 <td class="text-center text-muted py-3">${formatDate(leave.start_date)}
+        //                                 </td>
+        //                                 <td class="text-center text-muted py-3">${formatDate(leave.end_date)}
+        //                                 </td>
+        //                                 <td class="text-center text-muted py-3">
+        //                                     <span class="badge ${leaveTypeClass}">${leave.leave_type}</span>
+        //                                 </td>
+        //                                 <td class="text-center text-muted py-3">${leave.duration} day(s)
+        //                                 </td>
+        //                                 <td class="text-center py-3">
+        //                                     <span class="badge ${statusClass}">${status}</span>
+        //                                 </td>
+        // `;
 
-                tbody.appendChild(row);
-                i++;
-            });
-        }
-        wrapper.addEventListener("scroll", () => {
+        //         tbody.appendChild(row);
+        //         i++;
+        //     });
+        // }
 
-            const scrollPosition = wrapper.scrollTop + wrapper.clientHeight;
-            const threshold = wrapper.scrollHeight - 5;
+        // wrapper.addEventListener("scroll", () => {
 
-            if (scrollPosition >= threshold) {
-                loadEmployeeLeaves();
-            }
-        });
+        //     const scrollPosition = wrapper.scrollTop + wrapper.clientHeight;
+        //     const threshold = wrapper.scrollHeight - 5;
+
+        //     if (scrollPosition >= threshold) {
+        //         loadEmployeeLeaves();
+        //     }
+        // });
         function checkValableLeave() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;

@@ -1,0 +1,92 @@
+<%- include('partials/head.ejs') %>
+
+    <body>
+        <%- include('partials/sidebar.ejs') %>
+            <%- include('partials/header.ejs') %>
+                <main class="nxl-container">
+                    <div class="nxl-content">
+                        <div class="page-header">
+                            <div class="page-header-left d-flex align-items-center">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Be-Leave</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">Users</li>
+                                    <li class="breadcrumb-item">Delete user</li>
+                                </ul>
+                            </div>
+                            <div class="page-header-right ms-auto">
+                                <div class="page-header-right-items">
+                                    <div class="d-flex d-md-none">
+                                        <a href="javascript:void(0)" class="page-header-right-close-toggle">
+                                            <i class="feather-arrow-left me-2"></i>
+                                            <span>Back</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-md-none d-flex align-items-center">
+                                    <a href="javascript:void(0)" class="page-header-right-open-toggle">
+                                        <i class="feather-align-right fs-20"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- [ page-header ] end -->
+                        <div class="bg-white py-3 border-bottom rounded-0 p-md-0 mb-0">
+                            <div class="d-md-none d-flex align-items-center justify-content-between">
+                                <a href="javascript:void(0)" class="page-content-left-open-toggle">
+                                    <i class="feather-align-left fs-20"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- [ Main Content ] start -->
+                        <div class="main-content">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="overviewTab">
+                                    <div class="row">
+
+                                        <div class="col-12">
+                                            <div class="card stretch stretch-full d-flex">
+                                                <div class="card-header">
+                                                    <h4 class="header">Delete user</h4>
+                                                </div>
+                                                <div class="card-body">
+
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete user <span class="fw-bold">
+                                                            <%= users.firstName %>
+                                                                <%= users.name %>
+                                                        </span> (<span class="fw-bold">
+                                                            <%= users.email %>
+                                                        </span>) ?
+                                                    </div>
+                                                </div>
+
+                                                <div class="card-footer">
+                                                    <div class="row w-100">
+                                                        <div
+                                                            class="col-12 task-header d-md-flex align-items-center justify-content-start">
+                                                            <form action="/user/delete-user/<%= users.id %>"
+                                                                method="post">
+                                                                <button type="submit" class="btn btn-primary me-2"
+                                                                    id="submit">
+                                                                    Delete
+                                                                </button>
+                                                                <!-- <button class="btn btn-secondary">Cancel</button> -->
+                                                            </form>
+                                                            <a href="/user/list"
+                                                                class="btn btn-secondary me-2">Cancel</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%- include('partials/footer.ejs') %>
+    </body>
+
+    </html>

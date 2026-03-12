@@ -74,12 +74,12 @@ export class AppController {
       return res.render('register', { error: 'Invalid credentials' });
     }
 
-    return res.redirect('/');
+    return res.redirect('/user/list');
   }
 
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.USER, UserRole.PAYROLL)
   @Get('logout')
   async logout(@Req() req: any, @Res() res: any) {
     req.session.destroy();
