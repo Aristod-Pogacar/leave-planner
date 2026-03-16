@@ -160,6 +160,14 @@
 
                                                     </div>
                                                 </div>
+                                                <div class="card-footer d-none" id="footer-export">
+                                                    <form action="/leave/export-employee-leaves" method="get">
+                                                        <input type="hidden" name="employeeId" id="exportEmployeeId">
+                                                        <button class="btn btn-primary" type="submit">
+                                                            Export as Excel file
+                                                        </button>
+                                                    </form>
+                                                </div>
 
                                             </div>
                                         </div>
@@ -183,6 +191,9 @@
 
         const wrapper = document.getElementById("leaveHistoryWrapper");
         const tbody = document.getElementById("leaveHistoryBody");
+        const footer = document.getElementById("footer-export");
+        // const exportBTN = document.getElementById("export-btn");
+        const exportEmployeeId = document.getElementById("exportEmployeeId");
 
         var message = "";
 
@@ -255,6 +266,8 @@
                             hasMore = true;
                             tbody.innerHTML = "";
                             loadEmployeeLeaves(emp.id);
+                            footer.className = "card-footer";
+                            exportEmployeeId.value = emp.id;
                             // const historyResponse = await fetch(`/leave/employee-leaves/paginate/${emp.id}?skip=0&take=10`);
                             // const historyData = await historyResponse.json();
                             console.log("soldePermissionNumber:", soldePermissionNumber);

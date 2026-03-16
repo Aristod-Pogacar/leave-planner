@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
@@ -123,6 +123,78 @@ export class LeaveController {
   async getEmployeeCumulativeBalance(@Body('matricule') matricule: string, @Body('date') date: string) {
     const employee = await this.employeeService.findOneByMatricule(matricule);
     return this.leaveService.getEmployeeCumulativeBalance(employee?.id, new Date(date));
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Get('export')
+  @Render('export')
+  async exportView() {
+    const departementList = await this.employeeService.findAllDepartments()
+    const lineList = await this.employeeService.findAllLines()
+    return { title: "Export", departementList, lineList };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Post('export-planning')
+  async exportPlanningPost(
+    @Body('startDate') startDate: Date,
+    @Body('endDate') endDate: Date,
+    @Body('line') line: string,
+    @Body('departement') departement: string,
+    @Res() res: express.Response
+  ) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const workbook = await this.leaveService.exportLeavePlanning(start, end, line, departement);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=planning-${startDate}-${endDate}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+    console.log("Exported successfully");
+    res.end();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Get('export-employee-leaves')
+  async exportEmployeeLeaves(
+    @Query('employeeId') employeeId: string,
+    @Res() res: express.Response
+  ) {
+    console.log("Employee ID:", employeeId);
+    const employee = await this.employeeService.findOne(employeeId);
+    console.log("Employee:", employee);
+
+    if (!employee) {
+      return res.status(404).send('Employee not found');
+    }
+
+    const workbook = await this.leaveService.exportEmployeeLeaves(employee);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=employee-leaves-${employee.matricule}-${employee.fullname}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+    console.log("Exported successfully");
+    res.end();
   }
 
   @UseGuards(RolesGuard)

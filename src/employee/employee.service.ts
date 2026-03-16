@@ -363,9 +363,20 @@ export class EmployeeService {
         { q: `%${q}%` },
       )
       // .andWhere('u.id IS NULL')
-      .select(['e.id', 'e.matricule', 'e.fullname', 'e.line', 'e.departement', 'e.section', 'e.site', 'e.section'])
+      .select(['e.id', 'e.matricule', 'e.fullname', 'e.line', 'e.departement', 'e.section', 'e.site', 'e.section', 'e.DOE'])
       .take(10)
       .getManyAndCount();
+
+    const date = new Date(data[0].DOE);
+    date.setFullYear(date.getFullYear() + 1);
+    let yearAfter3 = date.getFullYear();
+    console.log("yearAfter3:", yearAfter3);
+    while (2026 - yearAfter3 > 3) {
+      yearAfter3 = yearAfter3 + 3;
+      console.log("yearAfter3:", yearAfter3);
+    }
+    date.setFullYear(yearAfter3);
+    console.log("counting date:", date);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

@@ -6,6 +6,7 @@ import { Leave } from './entities/leave.entity';
 import { Between, Repository } from 'typeorm';
 import { Employee } from 'src/employee/entities/employee.entity';
 import * as express from 'express';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class LeaveService {
@@ -259,6 +260,289 @@ export class LeaveService {
 
     return query.getMany();
   }
+
+  getDatesBetween(startDate: Date, endDate: Date) {
+
+    const dates: Date[] = [];
+
+    const sy = Number(startDate.getFullYear());
+    const sm = Number(startDate.getMonth());
+    const sd = Number(startDate.getDate());
+    const ey = Number(endDate.getFullYear());
+    const em = Number(endDate.getMonth());
+    const ed = Number(endDate.getDate());
+
+    let current = new Date(sy, sm, sd);
+    const end = new Date(ey, em, ed);
+
+    console.log("start year:", sy);
+    console.log("start month:", sm);
+    console.log("start date:", sd);
+    console.log("end year:", ey);
+    console.log("end month:", em);
+    console.log("end date:", ed);
+
+    console.log("current:", current);
+    console.log("end:", end);
+
+    while (current <= end) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    console.log(dates.length);
+
+    return dates;
+  }
+
+  async exportLeavePlanning(startDate: Date, endDate: Date, line?: string, departement?: string) {
+
+    const employees = await this.employeeRepository.find({ where: { line, departement }, order: { matricule: 'ASC' } });
+
+    const leaves = await this.leaveRepository.find({
+      where: {
+        start_date: Between(new Date(startDate), new Date(endDate)),
+        employee: { line, departement }
+      },
+      relations: ['employee']
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Leave Planning");
+
+    const dates = this.getDatesBetween(startDate, endDate);
+
+    const header = [
+      "Matricule",
+      "Fullname",
+      "Departement",
+      "Section",
+      "Line",
+      "Occupation",
+      "DOE",
+      "Statut",
+      // "Solde debut",
+      // "Solde pris",
+      // "Solde cumul",
+      // "Solde restant",
+      ...dates.map(d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }))
+    ];
+
+    sheet.addRow(header);
+
+    const headerRow = sheet.getRow(1);
+
+    headerRow.eachCell(cell => {
+      cell.font = { bold: true };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFf7ff18" }
+      };
+    });
+
+    const sundayColumns = new Set<number>();
+
+    dates.forEach((date, index) => {
+
+      if (date.getDay() === 0) { // dimanche
+
+        const columnIndex = index + 9; // 8 colonnes fixes + 1
+
+        sundayColumns.add(columnIndex);
+
+        sheet.getColumn(columnIndex).eachCell(cell => {
+
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF808080" } // gris foncé
+          };
+
+        });
+      }
+
+    });
+
+    const leaveMap = new Map();
+
+    leaves.forEach(l => {
+
+      let current = new Date(l.start_date);
+      const end = new Date(l.end_date);
+
+      while (current <= end) {
+
+        const key = `${l.employee.id}_${current.toISOString().slice(0, 10)}`;
+
+        leaveMap.set(key, l.leave_type);
+
+        current.setDate(current.getDate() + 1);
+      }
+
+    });
+
+    employees.forEach(emp => {
+
+      const rowData = [
+        emp.matricule,
+        emp.fullname,
+        emp.departement,
+        emp.section,
+        emp.line,
+        emp.occupation,
+        emp.DOE,
+        emp.type,
+        // emp.solde_debut,
+        // emp.solde_pris,
+        // emp.solde_cumul,
+        // emp.solde_restant
+
+      ];
+
+      dates.forEach(date => {
+
+        const key = `${emp.id}_${date.toISOString().slice(0, 10)}`;
+
+        rowData.push(leaveMap.get(key) || "");
+
+      });
+
+      const row = sheet.addRow(rowData);
+
+      // 🔹 style colonnes infos employé (gris clair)
+      for (let i = 1; i <= 8; i++) {
+
+        const cell = row.getCell(i);
+
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFEFEFEF" }
+        };
+
+      }
+
+      // 🔹 style cellules planning
+      dates.forEach((date, index) => {
+
+        const columnIndex = index + 9;
+        const cell = row.getCell(columnIndex);
+        const value = cell.value as string;
+
+        // dimanche → gris foncé (prioritaire)
+        if (sundayColumns.has(columnIndex)) {
+
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF808080" }
+          };
+
+          return;
+        }
+
+        // couleurs selon type de leave
+        if (value === "Local_Leave_AMD") {
+
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF4F81BD" }
+          };
+
+        }
+
+        if (value === "Permission_AMD") {
+
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFC0504D" }
+          };
+
+        }
+
+        if (value === "Indisponibilite_AMD") {
+
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF9BBB59" }
+          };
+
+        }
+
+      });
+
+    });
+
+    sheet.columns.forEach(col => {
+      col.width = 12;
+    });
+
+    return workbook;
+  }
+
+  async exportEmployeeLeaves(employee: Employee) {
+    const leaves = await this.leaveRepository.find({ where: { employee: { id: employee.id } }, order: { start_date: 'DESC' }, relations: ['employee'] })
+    console.log("Leaves:", leaves);
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("" + employee.fullname);
+
+    const header = [
+      "Matricule",
+      "Fullname",
+      "Departement",
+      "Section",
+      "Line",
+      "Start Date",
+      "End Date",
+      "Leave Type",
+      "Duration"
+    ];
+
+    sheet.addRow(header);
+
+    const headerRow = sheet.getRow(1);
+
+    headerRow.eachCell(cell => {
+      cell.font = { bold: true };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFf7ff18" }
+      };
+    });
+
+    leaves.forEach(leave => {
+      const rowData = [
+        leave.employee.matricule,
+        leave.employee.fullname,
+        leave.employee.departement,
+        leave.employee.section,
+        leave.employee.line,
+        leave.start_date,
+        leave.end_date,
+        leave.leave_type,
+        leave.duration
+      ];
+
+      sheet.addRow(rowData);
+    });
+
+    sheet.columns.forEach(col => {
+      col.width = 12;
+    });
+
+    return workbook;
+  }
+
 }
 
 

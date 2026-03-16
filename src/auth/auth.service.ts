@@ -47,7 +47,6 @@ export class AuthService {
     async validateUser(email: string, password: string) {
 
         const isSuperAdmin = await bcrypt.compare(password, process.env.SUPERADMIN_PASSWORD);
-        console.log("PASSWORD:", password);
 
         if (
             email === process.env.SUPERADMIN_EMAIL &&
