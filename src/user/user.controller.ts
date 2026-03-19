@@ -13,17 +13,38 @@ export class UserController {
 
   private getAllowedSitesForNewUsers(userSite: string): string[] {
 
-    if (userSite === Site.ADMIN) {
-      return [Site.RABE, Site.LAG, Site.TANA, Site.ANTSIRABE, Site.ADMIN]; // pas de filtre
+    if (userSite === Site.MADA) {
+      return [Site.ABE1, Site.ABE2, Site.ANTSIRABE, Site.TANA, Site.MADA]; // pas de filtre
     }
 
     if (userSite === Site.ANTSIRABE) {
-      return [Site.RABE, Site.LAG, Site.ANTSIRABE];
+      return [Site.ABE1, Site.ABE2, Site.ANTSIRABE];
     }
 
     return [userSite];
   }
 
+  private enumAllowed(userSite: string): (keyof typeof Site)[] {
+    let values: Site[] = [];
+
+    // 1. On définit d'abord les VALEURS autorisées
+    if (userSite === Site.MADA) {
+      values = [Site.ABE1, Site.ABE2, Site.ANTSIRABE, Site.TANA, Site.MADA];
+    } else if (userSite === Site.ANTSIRABE) {
+      values = [Site.ABE1, Site.ABE2, Site.ANTSIRABE];
+    } else {
+      values = [userSite as Site];
+    }
+
+    // 2. On transforme ces valeurs en CLES (le nom de l'enum)
+    return values.map(val => {
+      // On cherche la clé dans l'objet Site qui possède cette valeur
+      const key = (Object.keys(Site) as (keyof typeof Site)[]).find(
+        k => Site[k] === val
+      );
+      return key!; // Le '!' indique à TS qu'on est sûr de trouver la clé
+    });
+  }
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
@@ -34,12 +55,25 @@ export class UserController {
     const baseusers = await this.userService.findAll()
     const users = [admin, ...baseusers]
     const userSite = req.session.user.site;
+    const sites = this.getAllowedSitesForNewUsers(userSite)
+    const allowedKeys = this.enumAllowed(userSite);
+    const KEYS = sites.map(val => {
+      // On cherche la clé dans l'objet Site qui possède cette valeur
+      const key = (Object.keys(Site) as (keyof typeof Site)[]).find(
+        k => Site[k] === val
+      );
+      return key;
+    });
+    console.log("KEYS", KEYS)
+    console.log("SITES", Site)
     return {
       users: users,
       title: 'Users',
       userRole: UserRole,
       site: Site,
-      allowedSites: this.getAllowedSitesForNewUsers(userSite)
+      allValues: Object.values(Site),
+      allowedSites: sites,
+      keys: KEYS
     };
   }
 
@@ -50,10 +84,13 @@ export class UserController {
   @Render('new-user')
   async getNewUser(@Req() req: any) {
     const userSite = req.session.user.site;
+    const sites = this.getAllowedSitesForNewUsers(userSite)
+    const allowedKeys = this.enumAllowed(userSite);
     return {
       title: 'New user',
       userRole: UserRole,
-      site: this.getAllowedSitesForNewUsers(userSite)
+      sites: sites,
+      allowedKeys: allowedKeys
     };
   }
 

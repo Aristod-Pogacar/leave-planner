@@ -60,7 +60,7 @@ export class AuthService {
                 email: process.env.SUPERADMIN_EMAIL,
                 role: UserRole.SUPERADMIN,
                 isSuperAdmin: true,
-                site: Site.ADMIN,
+                site: Site.MADA,
             };
         }
 

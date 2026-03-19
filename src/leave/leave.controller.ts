@@ -18,12 +18,12 @@ export class LeaveController {
 
   private getAllowedSites(userSite: string): string[] {
 
-    if (userSite === Site.ADMIN) {
-      return [Site.RABE, Site.LAG, Site.TANA]; // pas de filtre
+    if (userSite === Site.MADA) {
+      return [Site.ABE1, Site.ABE2, Site.TANA]; // pas de filtre
     }
 
     if (userSite === Site.ANTSIRABE) {
-      return [Site.RABE, Site.LAG];
+      return [Site.ABE1, Site.ABE2];
     }
 
     return [userSite];
@@ -220,7 +220,14 @@ export class LeaveController {
     const allowedSites = this.getAllowedSites(req.session.user.site);
     const departementList = await this.employeeService.findAllDepartments()
     const lineList = await this.employeeService.findAllLines()
-    return { title: "Planning View", departementList, lineList, allowedSites };
+    const KEYS = allowedSites.map(val => {
+      // On cherche la clé dans l'objet Site qui possède cette valeur
+      const key = (Object.keys(Site) as (keyof typeof Site)[]).find(
+        k => Site[k] === val
+      );
+      return key;
+    });
+    return { title: "Planning View", departementList, lineList, allowedSites, KEYS };
   }
 
   @UseGuards(RolesGuard)

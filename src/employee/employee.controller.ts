@@ -15,19 +15,19 @@ export class EmployeeController {
 
   private getAllowedSites(userSite: string): string[] {
 
-    if (userSite === Site.ADMIN) {
-      return [Site.RABE, Site.LAG, Site.TANA]; // pas de filtre
+    if (userSite === Site.MADA) {
+      return [Site.ABE1, Site.ABE2, Site.TANA]; // pas de filtre
     }
 
-    if (userSite === Site.ANTSIRABE) {
-      return [Site.RABE, Site.LAG];
+    if (userSite === Site.ABE1) {
+      return [Site.ABE1, Site.ABE2];
     }
 
     return [userSite];
   }
   @Get('finding/search-list')
-  async search(@Query('q') q: string) {
-    return this.employeeService.search(q);
+  async search(@Query('q') q: string, @Req() req: any) {
+    return this.employeeService.search(q, req.session.user.site);
   }
 
   @Get('find-one-by-matricule')

@@ -43,17 +43,22 @@ export class EmployeeService {
 
     return parseFloat(total.toFixed(2));
   }
+
   private getAllowedSites(userSite: string): string[] {
 
-    if (userSite === "ADMIN") {
-      return []; // pas de filtre
+    if (userSite === Site.MADA) {
+      return [Site.ABE1, Site.ABE2, Site.TANA];
+    } else if (userSite === Site.ANTSIRABE) {
+      return [Site.ABE1, Site.ABE2];
+    } else if (userSite === Site.TANA) {
+      return [Site.TANA];
+    } else if (userSite === Site.ABE1) {
+      return [Site.ABE1];
+    } else if (userSite === Site.ABE2) {
+      return [Site.ABE2];
+    } else {
+      return [];
     }
-
-    if (userSite === "BIRA") {
-      return ["RABE", "LAG"];
-    }
-
-    return [userSite];
   }
 
   async getEmployeesWithBalances(
@@ -384,16 +389,18 @@ export class EmployeeService {
     };
   }
 
-  async search(q: string) {
+  async search(q: string, site: any) {
+    const allowedSites = this.getAllowedSites(site);
     if (!q) return [];
     const year = new Date().getFullYear();
     const [data] = await this.employeeRepository
       .createQueryBuilder('e')
       // .leftJoin('users', 'u', 'u.employee = e.matricule')
       .where(
-        'e.matricule LIKE :q OR e.fullname LIKE :q',
+        '(e.matricule LIKE :q OR e.fullname LIKE :q)',
         { q: `%${q}%` },
       )
+      .andWhere('e.site IN (:...allowedSites)', { allowedSites })
       // .andWhere('u.id IS NULL')
       .select(['e.id', 'e.matricule', 'e.fullname', 'e.line', 'e.departement', 'e.section', 'e.site', 'e.section', 'e.DOE'])
       .take(10)
@@ -403,13 +410,10 @@ export class EmployeeService {
     const date = new Date(data[0].DOE);
     date.setFullYear(date.getFullYear() + 1);
     let yearAfter3 = date.getFullYear();
-    console.log("yearAfter3:", yearAfter3);
     while (2026 - yearAfter3 > 3) {
       yearAfter3 = yearAfter3 + 3;
-      console.log("yearAfter3:", yearAfter3);
     }
     date.setFullYear(yearAfter3);
-    console.log("counting date:", date);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -426,6 +430,7 @@ export class EmployeeService {
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
       .andWhere('leave.start_date <= :today', { today })
+      .andWhere('employee.site IN (:...allowedSites)', { allowedSites })
       .groupBy('employee.id')
       .getRawMany();
 
@@ -441,6 +446,7 @@ export class EmployeeService {
       .andWhere('leave.leave_type = :type', { type: 'Permission_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
       .andWhere('leave.start_date <= :today', { today })
+      .andWhere('employee.site IN (:...allowedSites)', { allowedSites })
       .groupBy('employee.id')
       .getRawMany();
     // console.log("Data:", takenLeaves);
@@ -495,8 +501,6 @@ export class EmployeeService {
         permissions: Number(permissions.toFixed(2)),
       };
     });
-
-    console.log("Result:", result);
 
     return result;
   }

@@ -119,11 +119,11 @@
                                                                                 <label class="form-label">Site</label>
                                                                                 <select class="form-select" id="site"
                                                                                     name="site" required>
-                                                                                    <% Object.keys(site).forEach(key=>
+                                                                                    <% Object.keys(sites).forEach(key=>
                                                                                         { %>
                                                                                         <option
-                                                                                            value="<%= site[key] %>">
-                                                                                            <%= site[key] %>
+                                                                                            value="<%= sites[key] %>">
+                                                                                            <%= allowedKeys[key] %>
                                                                                         </option>
                                                                                         <% }) %>
                                                                                 </select>

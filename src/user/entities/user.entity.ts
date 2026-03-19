@@ -8,11 +8,11 @@ export enum UserRole {
 }
 
 export enum Site {
-    RABE = 'RABE',
-    LAG = 'LAG',
+    ABE1 = 'RABE',
+    ABE2 = 'LAG',
     ANTSIRABE = 'ANTSIRABE',
     TANA = 'TANA',
-    ADMIN = 'ADMIN',
+    MADA = 'ADMIN',
 }
 
 @Entity()
@@ -46,7 +46,7 @@ export class User {
     @Column({ nullable: true })
     verificationCode: string;
 
-    @Column({ type: 'enum', enum: Site, default: Site.RABE })
+    @Column({ type: 'enum', enum: Site, default: Site.ABE1 })
     site: Site;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })

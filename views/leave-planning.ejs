@@ -95,16 +95,21 @@
                                                                     <select class="form-select mx-3" name="siteFilter"
                                                                         id="siteFilter">
                                                                         <% allowedSites.forEach(function(site) { %>
-                                                                            <% if(site===user.site) { %>
-                                                                                <option value="<%= site %>" selected>
-                                                                                    <%= site %>
-                                                                                </option>
-                                                                                <% } else { %>
-                                                                                    <option value="<%= site %>">
-                                                                                        <%= site %>
+                                                                            <% const maValeur=site ; const
+                                                                                index=allowedSites.indexOf(maValeur);
+                                                                                const maCle=(index !==-1) ? KEYS[index]
+                                                                                : "Inconnu" ; %>
+                                                                                <% if(site===user.site) { %>
+                                                                                    <option value="<%= site %>"
+                                                                                        selected>
+                                                                                        <%= maCle %>
                                                                                     </option>
-                                                                                    <% } %>
-                                                                                        <% }); %>
+                                                                                    <% } else { %>
+                                                                                        <option value="<%= site %>">
+                                                                                            <%= maCle %>
+                                                                                        </option>
+                                                                                        <% } %>
+                                                                                            <% }); %>
                                                                     </select>
                                                                 </div>
                                                             </div>

@@ -31,7 +31,7 @@ export class UserService {
       phone: "-",
       email: process.env.SUPERADMIN_EMAIL,
       role: UserRole.SUPERADMIN,
-      site: Site.ADMIN,
+      site: Site.MADA,
     })
     return user;
   }

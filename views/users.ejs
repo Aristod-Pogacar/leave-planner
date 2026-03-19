@@ -181,9 +181,13 @@
                                                                             </div>
                                                                         </td>
                                                                         <td>
-                                                                            <div class="hstack gap-3">
-                                                                                <%= users.site %>
-                                                                            </div>
+                                                                            <% const maValeur=users.site ; const
+                                                                                index=allValues.indexOf(maValeur); const
+                                                                                maCle=(index !==-1) ? keys[index]
+                                                                                : "Inconnu" ; %>
+                                                                                <div class="hstack gap-3">
+                                                                                    <%= maCle %>
+                                                                                </div>
                                                                         </td>
                                                                         <td>
                                                                             <%= users.phone %>
