@@ -64,7 +64,7 @@
         const skip = 0;
         const take = 1000;
 
-        const employeeUrl = `http://localhost:3000/employee/find-all?line=${line}&departement=${departement}&site=${site}&skip=${skip}&take=${take}`;
+        const employeeUrl = `/employee/find-all?line=${line}&departement=${departement}&site=${site}&skip=${skip}&take=${take}`;
 
         const res = await fetch(employeeUrl);
 
@@ -80,7 +80,7 @@
 
         employees = data.data;
 
-        const leaveUrl = `http://localhost:3000/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}&site=${site}`;
+        const leaveUrl = `/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}&site=${site}`;
 
         const resLeave = await fetch(leaveUrl);
 
