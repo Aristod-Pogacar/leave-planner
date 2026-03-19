@@ -1,10 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 export enum UserRole {
-    USER = 'USER',
+    // USER = 'USER',
     ADMIN = 'ADMIN',
     PAYROLL = 'PAYROLL',
     SUPERADMIN = 'SUPERADMIN'
+}
+
+export enum Site {
+    RABE = 'RABE',
+    LAG = 'LAG',
+    ANTSIRABE = 'ANTSIRABE',
+    TANA = 'TANA',
+    ADMIN = 'ADMIN',
 }
 
 @Entity()
@@ -31,12 +39,15 @@ export class User {
     @Column({
         type: 'enum',
         enum: UserRole,
-        default: UserRole.USER
+        default: UserRole.PAYROLL
     })
     role: UserRole;
 
     @Column({ nullable: true })
     verificationCode: string;
+
+    @Column({ type: 'enum', enum: Site, default: Site.RABE })
+    site: Site;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     createdAt: Date;

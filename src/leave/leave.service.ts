@@ -18,12 +18,12 @@ export class LeaveService {
     private readonly employeeRepository: Repository<Employee>,
   ) { }
 
-  getLeavesByRange(year: number, startMonth: number, endMonth: number, line: string, departement: string) {
-    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, startMonth, 1), new Date(year, endMonth, 1)), employee: { line, departement } }, relations: ['employee'] });
+  getLeavesByRange(year: number, startMonth: number, endMonth: number, line: string, departement: string, site: string) {
+    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, startMonth, 1), new Date(year, endMonth, 1)), employee: { line, departement, site } }, relations: ['employee'] });
   }
 
-  getLeavesByMonthAndLineAndDepartement(year: number, month: number, line: string, departement: string) {
-    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, month, 1), new Date(year, month, 31)), employee: { line, departement } }, relations: ['employee'] });
+  getLeavesByMonthAndLineAndDepartement(year: number, month: number, line: string, departement: string, site: string) {
+    return this.leaveRepository.find({ where: { start_date: Between(new Date(year, month, 1), new Date(year, month, 31)), employee: { line, departement, site } }, relations: ['employee'] });
   }
 
   async create(createLeaveDto: CreateLeaveDto, res: express.Response) {

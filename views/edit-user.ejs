@@ -63,14 +63,14 @@
                                                                     <!-- Recherche Employé -->
                                                                     <div class="">
                                                                         <div class="row">
-                                                                            <div class="col-md-6 mb-3">
+                                                                            <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Name</label>
                                                                                 <input type="text" class="form-control"
                                                                                     id="name" name="name"
                                                                                     placeholder="Enter your name"
                                                                                     value="<%= users.name %>" required>
                                                                             </div>
-                                                                            <div class="col-md-6 mb-3">
+                                                                            <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">First
                                                                                     name</label>
                                                                                 <input type="text" class="form-control"
@@ -79,12 +79,6 @@
                                                                                     value="<%= users.firstName %>"
                                                                                     required>
                                                                             </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <!-- Recherche Employé -->
-                                                                    <div class="">
-                                                                        <div class="row">
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Phone
                                                                                     number</label>
@@ -93,6 +87,12 @@
                                                                                     placeholder="Enter your phone number"
                                                                                     value="<%= users.phone %>" required>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Recherche Employé -->
+                                                                    <div class="">
+                                                                        <div class="row">
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Email</label>
                                                                                 <input type="text" class="form-control"
@@ -103,7 +103,7 @@
                                                                             </div>
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Role</label>
-                                                                                <select class="form-control" id="role"
+                                                                                <select class="form-select" id="role"
                                                                                     name="role" required>
                                                                                     <%
                                                                                         Object.keys(userRole).forEach(key=>
@@ -120,6 +120,22 @@
                                                                                             </option>
                                                                                             <% } %>
                                                                                                 <% }) %>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-4 mb-3">
+                                                                                <label class="form-label">Site</label>
+                                                                                <select class="form-select" id="site"
+                                                                                    name="site" required>
+                                                                                    <% Object.keys(site).forEach(key=>
+                                                                                        { %>
+                                                                                        <option value="<%= site[key] %>"
+                                                                                            <% if
+                                                                                            (site[key]===users.site) {
+                                                                                            %>
+                                                                                            selected <% } %>>
+                                                                                                <%= site[key] %>
+                                                                                        </option>
+                                                                                        <% }) %>
                                                                                 </select>
                                                                             </div>
                                                                         </div>

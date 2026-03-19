@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, UnauthorizedExcept
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { Site, User, UserRole } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +20,19 @@ export class UserService {
       ...createUserDto,
       password: hashedPassword,
     });
+    return user;
+  }
+
+  async getAdminUser() {
+    const user = this.userRepo.create({
+      id: 'superadmin',
+      firstName: 'Super',
+      name: 'Admin',
+      phone: "-",
+      email: process.env.SUPERADMIN_EMAIL,
+      role: UserRole.SUPERADMIN,
+      site: Site.ADMIN,
+    })
     return user;
   }
 

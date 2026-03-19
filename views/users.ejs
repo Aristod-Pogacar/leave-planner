@@ -92,11 +92,13 @@
                                                     </div>
                                                     <div class="">
                                                         <div class="d-flex gap-2">
-                                                            <a href="/user/new-user" class="btn btn-success"
-                                                                title="New user">
-                                                                <i class="feather-plus me-2"></i>
-                                                                <span>New user</span>
-                                                            </a>
+                                                            <% if(user.role !=="PAYROLL" ) { %>
+                                                                <a href="/user/new-user" class="btn btn-success"
+                                                                    title="New user">
+                                                                    <i class="feather-plus me-2"></i>
+                                                                    <span>New user</span>
+                                                                </a>
+                                                                <% } %>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -109,6 +111,7 @@
                                                                 <th>#</th>
                                                                 <th>First Name</th>
                                                                 <th>Last Name</th>
+                                                                <th>Site</th>
                                                                 <th>Phone</th>
                                                                 <th>Email</th>
                                                                 <th class="text-center">Role</th>
@@ -118,7 +121,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
+                                                            <!-- <tr>
                                                                 <td>1</td>
                                                                 <td>
                                                                     <div
@@ -130,7 +133,16 @@
                                                                         Admin
                                                                     </div>
                                                                 </td>
-                                                                <td>-</td>
+                                                                <td>
+                                                                    <div class="hstack gap-3">
+                                                                        ADMIN
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="hstack gap-3">
+                                                                        -
+                                                                    </div>
+                                                                </td>
                                                                 <td>stagedp@aquarabe.mg</td>
                                                                 <td class="text-center"><span
                                                                         class="badge bg-soft-danger text-danger">Super
@@ -140,8 +152,8 @@
                                                                     <td class="text-center">
                                                                     </td>
                                                                     <% } %>
-                                                            </tr>
-                                                            <% var i=2 %>
+                                                            </tr> -->
+                                                            <% var i=1 %>
                                                                 <% users.forEach(users=> { var roleColor="primary"
                                                                     if (users.role==userRole.SUPERADMIN)
                                                                     {
@@ -169,6 +181,11 @@
                                                                             </div>
                                                                         </td>
                                                                         <td>
+                                                                            <div class="hstack gap-3">
+                                                                                <%= users.site %>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
                                                                             <%= users.phone %>
                                                                         </td>
                                                                         <td>
@@ -180,8 +197,10 @@
                                                                                 <%= users.role %>
                                                                             </span>
                                                                         </td>
-                                                                        <% if(user.role !=="PAYROLL" ) { %>
-                                                                            <td class="text-center">
+                                                                        <td class="text-center">
+                                                                            <% if(user.role !=="PAYROLL" &&
+                                                                                allowedSites.includes(users.site) &&
+                                                                                users.role !==userRole.SUPERADMIN ) { %>
                                                                                 <div
                                                                                     class="hstack gap-2 justify-content-center">
                                                                                     <a href="/user/edit-user/<%= users.id %>"
@@ -197,8 +216,8 @@
                                                                                         <i class="feather-trash"></i>
                                                                                     </a>
                                                                                 </div>
-                                                                            </td>
-                                                                            <% } %>
+                                                                                <% } %>
+                                                                        </td>
                                                                     </tr>
                                                                     <% }) %>
                                                         </tbody>

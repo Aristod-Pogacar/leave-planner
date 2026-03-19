@@ -51,32 +51,32 @@
                                     <h6>
                                         <% var i=2; var roleColor="primary" ; if (user.role=="SUPERADMIN" ) {
                                             roleColor="danger" } else if (user.role=="ADMIN" ) { roleColor="warning" }
-                                            else if (user.role=="PAYROLL" ) { roleColor="info" } else if
-                                            (user.role=="USER" ) { roleColor="primary" } %>
+                                            else if (user.role=="PAYROLL" ) { roleColor="info" } %>
                                             <span class="badge bg-soft-<%= roleColor %> text-<%= roleColor %> ms-1">
                                                 <%= user.role %>
+                                            </span>
+                                            <span class="badge bg-soft-success text-success ms-1">
+                                                <%= user.site %>
                                             </span>
                                     </h6>
                                 </div>
                             </div>
                         </div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="feather-user"></i>
-                            <span>Profile Details</span>
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="feather-bell"></i>
-                            <span>Notifications</span>
-                        </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="feather-settings"></i>
-                            <span>Account Settings</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="/logout" class="dropdown-item">
-                            <i class="feather-log-out"></i>
-                            <span>Logout</span>
-                        </a>
+                        <% if (user.role!=="SUPERADMIN" ) { %>
+                            <a href="javascript:void(0);" class="dropdown-item">
+                                <i class="feather-user"></i>
+                                <span>Profile Details</span>
+                            </a>
+                            <a href="javascript:void(0);" class="dropdown-item">
+                                <i class="feather-settings"></i>
+                                <span>Account Settings</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <% } %>
+                                <a href="/logout" class="dropdown-item">
+                                    <i class="feather-log-out"></i>
+                                    <span>Logout</span>
+                                </a>
                     </div>
                 </div>
             </div>

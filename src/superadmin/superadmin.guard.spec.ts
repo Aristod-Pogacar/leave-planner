@@ -1,7 +1,7 @@
-import { SuperadminGuard } from './superadmin.guard';
+import { SuperAdminGuard } from './superadmin.guard';
 
-describe('SuperadminGuard', () => {
+describe('SuperAdminGuard', () => {
   it('should be defined', () => {
-    expect(new SuperadminGuard()).toBeDefined();
+    expect(new SuperAdminGuard()).toBeDefined();
   });
 });

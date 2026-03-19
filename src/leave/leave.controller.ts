@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
@@ -7,7 +7,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { SuperAdminGuard } from 'src/superadmin/superadmin.guard';
 import { RolesGuard } from 'src/user/role.guard';
 import { Roles } from 'src/user/role.decorator';
-import { UserRole } from 'src/user/entities/user.entity';
+import { UserRole, Site } from 'src/user/entities/user.entity';
 
 @Controller('leave')
 export class LeaveController {
@@ -15,6 +15,19 @@ export class LeaveController {
     private readonly leaveService: LeaveService,
     private readonly employeeService: EmployeeService
   ) { }
+
+  private getAllowedSites(userSite: string): string[] {
+
+    if (userSite === Site.ADMIN) {
+      return [Site.RABE, Site.LAG, Site.TANA]; // pas de filtre
+    }
+
+    if (userSite === Site.ANTSIRABE) {
+      return [Site.RABE, Site.LAG];
+    }
+
+    return [userSite];
+  }
 
   @Get('new-leave')
   @UseGuards(RolesGuard)
@@ -34,7 +47,7 @@ export class LeaveController {
 
   @Get('leave-history')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Render('leave-history')
   async leaveHistory(@Query() query: any, @Query() error?: string) {
     return { title: "Leave History", error: error ? error : null };
@@ -92,8 +105,9 @@ export class LeaveController {
     @Query('endMonth') endMonth: number,
     @Query('line') line: string,
     @Query('departement') departement: string,
+    @Query('site') site: string,
   ) {
-    return this.leaveService.getLeavesByRange(year, startMonth, endMonth, line, departement);
+    return this.leaveService.getLeavesByRange(year, startMonth, endMonth, line, departement, site);
   }
 
   @Get('month-line-departement')
@@ -102,8 +116,9 @@ export class LeaveController {
     @Query('month') month: number,
     @Query('line') line: string,
     @Query('departement') departement: string,
+    @Query('site') site: string,
   ) {
-    return this.leaveService.getLeavesByMonthAndLineAndDepartement(year, month, line, departement);
+    return this.leaveService.getLeavesByMonthAndLineAndDepartement(year, month, line, departement, site);
   }
 
   @Get('planning')
@@ -126,7 +141,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Get('export')
   @Render('export')
   async exportView() {
@@ -136,7 +151,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Post('export-planning')
   async exportPlanningPost(
     @Body('startDate') startDate: Date,
@@ -166,7 +181,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Get('export-employee-leaves')
   async exportEmployeeLeaves(
     @Query('employeeId') employeeId: string,
@@ -198,13 +213,14 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Get('planning-view')
   @Render('leave-planning')
-  async planningView() {
+  async planningView(@Req() req: any) {
+    const allowedSites = this.getAllowedSites(req.session.user.site);
     const departementList = await this.employeeService.findAllDepartments()
     const lineList = await this.employeeService.findAllLines()
-    return { title: "Planning View", departementList, lineList };
+    return { title: "Planning View", departementList, lineList, allowedSites };
   }
 
   @UseGuards(RolesGuard)
@@ -216,7 +232,7 @@ export class LeaveController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Get('simulate-leave')
   @Render('simulate-leave')
   async simulateLeave() {

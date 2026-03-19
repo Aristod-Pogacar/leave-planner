@@ -16,7 +16,10 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+      const mockResponse = {
+        send: jest.fn().mockReturnThis(),
+      } as any;
+      expect(appController.getHello(mockResponse)).toBe(mockResponse);
     });
   });
 });

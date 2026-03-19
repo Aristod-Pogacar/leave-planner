@@ -62,14 +62,14 @@
                                                                     <!-- Recherche Employé -->
                                                                     <div class="">
                                                                         <div class="row">
-                                                                            <div class="col-md-6 mb-3">
+                                                                            <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Name</label>
                                                                                 <input type="text" class="form-control"
                                                                                     id="name" name="name"
                                                                                     placeholder="Enter your name"
                                                                                     required>
                                                                             </div>
-                                                                            <div class="col-md-6 mb-3">
+                                                                            <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">First
                                                                                     name</label>
                                                                                 <input type="text" class="form-control"
@@ -77,12 +77,6 @@
                                                                                     placeholder="Enter your first name"
                                                                                     required>
                                                                             </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <!-- Recherche Employé -->
-                                                                    <div class="">
-                                                                        <div class="row">
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Phone
                                                                                     number</label>
@@ -91,6 +85,12 @@
                                                                                     placeholder="Enter your phone number"
                                                                                     required>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Recherche Employé -->
+                                                                    <div class="">
+                                                                        <div class="row">
                                                                             <div class="col-md-4 mb-3">
                                                                                 <label class="form-label">Email</label>
                                                                                 <input type="text" class="form-control"
@@ -113,6 +113,19 @@
                                                                                             </option>
                                                                                             <% } %>
                                                                                                 <% }) %>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-4 mb-3">
+                                                                                <label class="form-label">Site</label>
+                                                                                <select class="form-select" id="site"
+                                                                                    name="site" required>
+                                                                                    <% Object.keys(site).forEach(key=>
+                                                                                        { %>
+                                                                                        <option
+                                                                                            value="<%= site[key] %>">
+                                                                                            <%= site[key] %>
+                                                                                        </option>
+                                                                                        <% }) %>
                                                                                 </select>
                                                                             </div>
                                                                         </div>

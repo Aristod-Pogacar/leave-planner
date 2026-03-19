@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, Render, UseInterceptors, Res, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, Render, UseInterceptors, Res, Query, UseGuards, Req } from '@nestjs/common';
 import express from 'express'; // ✅ SEULE VERSION CORRECTE
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EmployeeService } from './employee.service';
@@ -7,12 +7,24 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { memoryStorage } from 'multer';
 import { RolesGuard } from 'src/user/role.guard';
 import { Roles } from 'src/user/role.decorator';
-import { UserRole } from 'src/user/entities/user.entity';
+import { Site, UserRole } from 'src/user/entities/user.entity';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) { }
 
+  private getAllowedSites(userSite: string): string[] {
+
+    if (userSite === Site.ADMIN) {
+      return [Site.RABE, Site.LAG, Site.TANA]; // pas de filtre
+    }
+
+    if (userSite === Site.ANTSIRABE) {
+      return [Site.RABE, Site.LAG];
+    }
+
+    return [userSite];
+  }
   @Get('finding/search-list')
   async search(@Query('q') q: string) {
     return this.employeeService.search(q);
@@ -46,35 +58,63 @@ export class EmployeeController {
 
   @Get('find-all')
   async findAllByLineAndSection(
+    @Req() req: any,
     @Query('line') line: string,
     @Query('departement') departement: string,
+    @Query('site') site: string,
     @Query('skip') skip: number = 0,
     @Query('take') take: number = 50,
     @Query('year') year: number = new Date().getFullYear(),
   ) {
-    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, +skip, +take, +year);
+    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, site, +skip, +take, +year);
     // console.log("employees", employees);
+    console.log("SESSION:", req.session.user);
     return employees;
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }
 
   @Get('test')
   async test(
+    @Req() req: any,
     @Query('line') line: string,
     @Query('departement') departement: string,
+    @Query('site') site: string,
     @Query('skip') skip: number = 0,
     @Query('take') take: number = 50,
     @Query('year') year: number = new Date().getFullYear(),
   ) {
-    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, +skip, +take, +year);
+    const employees = await this.employeeService.getEmployeesWithBalances(line, departement, site, +skip, +take, +year);
     console.log("employees", employees);
     return employees;
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }
 
+  @Get('new-employee')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
+  @Render('new-employee')
+  async newEmployee(
+    @Req() req, any,
+    @Query('line') line: string,
+    @Query('departement') departement: string,
+  ) {
+    const allowedSites = this.getAllowedSites(req.session.user.site);
+    const employees = await this.employeeService.getEmployees(line, departement);
+    return { title: "New Employee", employees, allowedSites };
+  }
+
+  @Post('new-employee')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
+  async newEmployeePost(@Body() body: any, @Res() res: express.Response) {
+    console.log("BODY:", body);
+    await this.employeeService.create(body);
+    return res.redirect('/');
+  }
+
   @Get('import-master-file')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Render('import-master-file')
   async importMasterFile() {
     return { title: "Import Master File" };
@@ -82,7 +122,7 @@ export class EmployeeController {
 
   @Post('import-master-file')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),

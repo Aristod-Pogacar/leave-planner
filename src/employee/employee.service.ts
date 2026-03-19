@@ -3,10 +3,11 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
 import { Leave } from 'src/leave/entities/leave.entity';
+import { Site } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class EmployeeService {
@@ -42,10 +43,23 @@ export class EmployeeService {
 
     return parseFloat(total.toFixed(2));
   }
+  private getAllowedSites(userSite: string): string[] {
+
+    if (userSite === "ADMIN") {
+      return []; // pas de filtre
+    }
+
+    if (userSite === "BIRA") {
+      return ["RABE", "LAG"];
+    }
+
+    return [userSite];
+  }
 
   async getEmployeesWithBalances(
     line: string,
     departement: string,
+    site: string,
     skip: number,
     take: number,
     year: number,
@@ -53,7 +67,7 @@ export class EmployeeService {
 
     // 1️⃣ Récupérer les employés
     const [employees, total] = await this.employeeRepository.findAndCount({
-      where: { line, departement },
+      where: { line, departement, site },
       order: { matricule: 'ASC' },
       skip,
       take,
@@ -82,6 +96,7 @@ export class EmployeeService {
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
       .andWhere('leave.start_date <= :today', { today })
+      .andWhere('employee.site = :site', { site })
       .groupBy('employee.id')
       .getRawMany();
 
@@ -99,6 +114,7 @@ export class EmployeeService {
       .andWhere('leave.leave_type = :type', { type: 'Permission_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year })
       .andWhere('leave.start_date <= :today', { today })
+      .andWhere('employee.site = :site', { site })
       .groupBy('employee.id')
       .getRawMany();
 
@@ -154,6 +170,22 @@ export class EmployeeService {
     });
 
     return { data: result, total };
+  }
+
+  async getEmployees(
+    line: string,
+    departement: string,
+  ) {
+    const [employees, total] = await this.employeeRepository.findAndCount({
+      where: { line, departement },
+      order: { matricule: 'ASC' },
+    });
+
+    if (employees.length === 0) {
+      return { data: [], total };
+    } else {
+      return { data: employees, total };
+    }
   }
 
   async findDepartement() {
@@ -367,6 +399,7 @@ export class EmployeeService {
       .take(10)
       .getManyAndCount();
 
+    if (data.length === 0 || !data) return [];
     const date = new Date(data[0].DOE);
     date.setFullYear(date.getFullYear() + 1);
     let yearAfter3 = date.getFullYear();

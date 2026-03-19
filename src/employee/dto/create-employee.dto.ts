@@ -24,6 +24,7 @@ export class CreateEmployeeDto {
 
     @IsString()
     @IsNotEmpty()
+    @IsEnum(['BK', 'CS'])
     pay_mode!: string;
 
     @IsDate()
@@ -51,7 +52,7 @@ export class CreateEmployeeDto {
     division!: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     div!: string;
 
     @IsString()

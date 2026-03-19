@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Render, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, UseGuards, Res, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { UserRole } from './entities/user.entity';
+import { UserRole, Site, User } from './entities/user.entity';
 import { RolesGuard } from './role.guard';
 import { Roles } from './role.decorator';
 
@@ -11,16 +11,35 @@ import { Roles } from './role.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
+  private getAllowedSitesForNewUsers(userSite: string): string[] {
+
+    if (userSite === Site.ADMIN) {
+      return [Site.RABE, Site.LAG, Site.TANA, Site.ANTSIRABE, Site.ADMIN]; // pas de filtre
+    }
+
+    if (userSite === Site.ANTSIRABE) {
+      return [Site.RABE, Site.LAG, Site.ANTSIRABE];
+    }
+
+    return [userSite];
+  }
+
   @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Get('list')
   @Render('users')
-  async getList() {
+  async getList(@Req() req: any) {
+    const admin = await this.userService.getAdminUser()
+    const baseusers = await this.userService.findAll()
+    const users = [admin, ...baseusers]
+    const userSite = req.session.user.site;
     return {
-      users: await this.userService.findAll(),
+      users: users,
       title: 'Users',
-      userRole: UserRole
+      userRole: UserRole,
+      site: Site,
+      allowedSites: this.getAllowedSitesForNewUsers(userSite)
     };
   }
 
@@ -29,10 +48,12 @@ export class UserController {
   @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('new-user')
   @Render('new-user')
-  async getNewUser() {
+  async getNewUser(@Req() req: any) {
+    const userSite = req.session.user.site;
     return {
       title: 'New user',
-      userRole: UserRole
+      userRole: UserRole,
+      site: this.getAllowedSitesForNewUsers(userSite)
     };
   }
 
@@ -63,11 +84,13 @@ export class UserController {
   @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get('edit-user/:id')
   @Render('edit-user')
-  async editUser(@Param('id') id: string) {
+  async editUser(@Param('id') id: string, @Req() req: any) {
+    const userSite = req.session.user.site;
     return {
       title: 'Edit user',
       userRole: UserRole,
-      users: await this.userService.findOne(id)
+      users: await this.userService.findOne(id),
+      site: this.getAllowedSitesForNewUsers(userSite)
     };
   }
 

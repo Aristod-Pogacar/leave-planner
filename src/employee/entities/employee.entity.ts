@@ -99,6 +99,12 @@ export class Employee {
     @Column()
     type!: string;
 
+    @Column({ default: false })
+    is_deleted!: boolean;
+
+    @Column({ default: true })
+    is_active!: boolean;
+
     @OneToMany(() => Leave, leave => leave.employee)
     leaves: Leave[];
 }

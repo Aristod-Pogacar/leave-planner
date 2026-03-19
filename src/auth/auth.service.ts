@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User, UserRole } from 'src/user/entities/user.entity';
+import { Site, User, UserRole } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { MailService } from 'src/mail/mail.service';
 import * as bcrypt from 'bcrypt';
@@ -60,6 +60,7 @@ export class AuthService {
                 email: process.env.SUPERADMIN_EMAIL,
                 role: UserRole.SUPERADMIN,
                 isSuperAdmin: true,
+                site: Site.ADMIN,
             };
         }
 

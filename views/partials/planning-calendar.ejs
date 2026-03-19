@@ -22,6 +22,7 @@
     const query = new URLSearchParams(window.location.search);
 
     const defaultLine = query.get("line") || "NULL";
+    const defaultSite = query.get("site") || "RABE";
     const defaultDepartement = query.get("departement") || "HR";
 
     let employees = [];
@@ -35,9 +36,11 @@
 
     const lineElement = document.getElementById("lineFilter");
     const departementElement = document.getElementById("departementFilter");
+    const siteElement = document.getElementById("siteFilter");
 
     lineElement.addEventListener("change", loadPlanning);
     departementElement.addEventListener("change", loadPlanning);
+    siteElement.addEventListener("change", loadPlanning);
 
     let firstTime = true;
 
@@ -45,6 +48,7 @@
 
         var line = lineElement.value || defaultLine;
         var departement = departementElement.value || defaultDepartement;
+        var site = siteElement.value;
 
         if (firstTime) {
             line = defaultLine;
@@ -58,9 +62,9 @@
         const startMonth = 1;
         const endMonth = 3;
         const skip = 0;
-        const take = 20;
+        const take = 1000;
 
-        const employeeUrl = `http://localhost:3000/employee/find-all?line=${line}&departement=${departement}&skip=${skip}&take=${take}`;
+        const employeeUrl = `http://localhost:3000/employee/find-all?line=${line}&departement=${departement}&site=${site}&skip=${skip}&take=${take}`;
 
         const res = await fetch(employeeUrl);
 
@@ -69,11 +73,14 @@
             return;
         }
 
+        const userSession = sessionStorage;
+        console.log("userSession:", userSession);
+
         const data = await res.json();
 
         employees = data.data;
 
-        const leaveUrl = `http://localhost:3000/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}`;
+        const leaveUrl = `http://localhost:3000/leave/range?year=${year}&startMonth=${startMonth}&endMonth=${endMonth}&line=${line}&departement=${departement}&site=${site}`;
 
         const resLeave = await fetch(leaveUrl);
 
