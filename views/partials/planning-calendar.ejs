@@ -100,6 +100,7 @@
         employeeColumn.innerHTML += `
   <div class="employee-row header-row">
     <div class="header-cell">EMPLOYEES</div>
+    <div class="header-cell">DEBUT</div>
     <div class="header-cell">CUMUL</div>
     <div class="header-cell">TAKEN</div>
     <div class="header-cell">LEFT</div>
@@ -116,6 +117,7 @@
             employeeColumn.innerHTML += `
     <div class="employee-row">
       <div class="employee-cell leave-bar-text">${emp.matricule} - ${emp.fullname}</div>
+      <div class="employee-cell text-center">${emp.solde_debut}</div>
       <div class="employee-cell text-center">${cumule}</div>
       <div class="employee-cell text-center">${prises}</div>
       <div class="employee-cell text-center">${restant}</div>

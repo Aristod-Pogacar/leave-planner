@@ -57,7 +57,7 @@ export class UserController {
     const userSite = req.session.user.site;
     const sites = this.getAllowedSitesForNewUsers(userSite)
     const allowedKeys = this.enumAllowed(userSite);
-    const KEYS = sites.map(val => {
+    const KEYS = Object.values(Site).map(val => {
       // On cherche la clé dans l'objet Site qui possède cette valeur
       const key = (Object.keys(Site) as (keyof typeof Site)[]).find(
         k => Site[k] === val
@@ -66,6 +66,7 @@ export class UserController {
     });
     console.log("KEYS", KEYS)
     console.log("SITES", Site)
+    console.log("AllValues", Object.values(Site))
     return {
       users: users,
       title: 'Users',

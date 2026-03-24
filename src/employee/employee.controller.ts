@@ -66,9 +66,12 @@ export class EmployeeController {
     @Query('take') take: number = 50,
     @Query('year') year: number = new Date().getFullYear(),
   ) {
+    // const test = await this.employeeService.getEmployeeSolde("10784", new Date("2017-12-31"))
+    // console.log("TEST 10784 2017-01-10:", test);
+
     const employees = await this.employeeService.getEmployeesWithBalances(line, departement, site, +skip, +take, +year);
     // console.log("employees", employees);
-    console.log("SESSION:", req.session.user);
+    // console.log("SESSION:", req.session.user);
     return employees;
     // return this.employeeService.findAllByLineAndDepartement(line, departement, +skip, +take, year);
   }

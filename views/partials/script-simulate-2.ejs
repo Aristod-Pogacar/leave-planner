@@ -7,17 +7,18 @@
     const hiddenInputMatricule1 = document.getElementById('matricule1');
     const reasonInput1 = document.getElementById('reason1');
     const simulateButton = document.getElementById('simulateButton');
+    const simulateDate = document.getElementById('simulate_date');
     const formSimulation = document.getElementById('formSimulation');
     const leaveType = document.getElementById('leave_type');
 
     const startDate1 = document.getElementById('startDate1');
-    startDate1.value = new Date().toISOString().split("T")[0];
     const endDate1 = document.getElementById('endDate1');
-    endDate1.value = new Date().toISOString().split("T")[0];
-    // const hiddenInput = document.getElementById('employee');
+    const messageContainer = document.getElementById('message1');
 
     let timeout1 = null;
     simulateButton.addEventListener('click', checkSimulationLeave);
+    startDate1.addEventListener('change', checkSimulationLeave);
+    endDate1.addEventListener('change', checkSimulationLeave);
 
     const soldeCumule1 = document.getElementById('soldeCumule1');
     const soldePris1 = document.getElementById('soldePris1');
@@ -53,7 +54,6 @@
                 data.forEach(emp => {
                     const li = document.createElement('li');
                     li.classList.add('list-group-item');
-                    // li.classList.add('autocomplete-list-item');
                     li.textContent = `${emp.matricule} - ${emp.fullname}`;
                     li.onclick = () => {
                         input1.value = li.textContent;
@@ -63,7 +63,6 @@
                         soldePris1.textContent = emp.solde_pris;
                         soldeRestant1.textContent = emp.solde_restant;
                         solde = emp.solde_restant;
-                        // checkSimulationLeave();
                         results1.innerHTML = '';
                     };
                     results1.appendChild(li);
@@ -76,8 +75,21 @@
     });
 
     function checkSimulationLeave() {
+        let styleAlert = "danger";
+        if (hiddenInputMatricule1.value === "") {
+            messageContainer.innerHTML = "Choose an employee";
+            styleAlert = "danger";
+            messageContainer.className = "alert alert-" + styleAlert;
+            return;
+        }
+        if (simulateDate.value === "") {
+            messageContainer.innerHTML = "Choose a date for simulation";
+            styleAlert = "danger";
+            messageContainer.className = "alert alert-" + styleAlert;
+            return;
+        }
         console.log("Matricule:", hiddenInputMatricule1.value);
-        console.log("Date:", startDate1.value);
+        console.log("Date:", simulateDate.value);
         const simulation = fetch('/leave/simulate-cumul-balance', {
             method: 'POST',
             headers: {
@@ -85,7 +97,7 @@
             },
             body: JSON.stringify({
                 matricule: hiddenInputMatricule1.value,
-                date: startDate1.value,
+                date: simulateDate.value,
             }),
         }).then(res => res.json()).then(data => {
             console.log("Data:", data);
@@ -94,7 +106,6 @@
             solde_cumule_simulate = data.solde_cumul;
             const startDate = document.getElementById('startDate1').value;
             const endDate = document.getElementById('endDate1').value;
-            const messageContainer = document.getElementById('message1');
 
             soldeCumule2.textContent = solde_cumule_simulate;
             soldePris2.textContent = solde_pris_simulate;
@@ -102,25 +113,25 @@
             console.log("SOLDE SIMULATE:", solde_simulate);
             console.log("SOLDE PRIS:", solde_pris_simulate);
             console.log("SOLDE CUMULE:", solde_cumule_simulate);
-            // const solde = document.getElementById('soldeRestant').textContent;
             const numberOfDays = getNumberOfDays(startDate, endDate);
             console.log("NUMBER OF DAYS:", numberOfDays)
             if (numberOfDays > solde_simulate) {
                 console.log("Solde de congé: " + solde_simulate + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)");
             }
             if (!checkDate(startDate, endDate) || numberOfDays <= 0) {
-                messageContainer.innerHTML = "Date invalide";
-                messageContainer.style.color = "red";
+                messageContainer.innerHTML = "Invalid starting or ending date";
+                styleAlert = "warning";
             } else if ((solde === null || solde === undefined || solde === "")) {
-                messageContainer.innerHTML = "Veuillez choisir un employé";
-                messageContainer.style.color = "red";
+                messageContainer.innerHTML = "Choose an employee";
+                styleAlert = "danger";
             } else if (leaveType.value === 'Local_Leave_AMD' && numberOfDays >= solde_simulate) {
-                messageContainer.innerHTML = "Solde de congé: " + solde_simulate + " jours. Insuffisant pour cette demande (" + numberOfDays + " jours)";
-                messageContainer.style.color = "red";
+                messageContainer.innerHTML = "Leave balance: " + solde_simulate + " days. Insufficient for this request (" + numberOfDays + " days)";
+                styleAlert = "danger";
             } else {
-                messageContainer.style.color = "green";
-                messageContainer.innerHTML = "Congé valable pour la demande de " + numberOfDays + " jours.";
+                styleAlert = "success";
+                messageContainer.innerHTML = "Leave is valid for the request of " + numberOfDays + " day(s).";
             }
+            messageContainer.className = "alert alert-" + styleAlert;
         });
     }
     function getNumberOfDays(startDateStr, endDateStr) {

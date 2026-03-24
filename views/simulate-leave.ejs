@@ -52,7 +52,8 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
-
+                                                        <div class="d-none" role="alert" id="message1">
+                                                        </div>
                                                         <!-- ===== LEFT: FORM ===== -->
                                                         <div class="col-md-6 border-end">
 
@@ -61,7 +62,7 @@
                                                                 <label class="form-label">Employee</label>
                                                                 <input type="text" class="form-control"
                                                                     id="employeeSearch1" autocomplete="off"
-                                                                    placeholder="Search an employee...">
+                                                                    placeholder="Search an employee..." required>
                                                                 <input type="text" class="input" name="employee"
                                                                     id="employee1" hidden required>
                                                                 <input type="text" class="input" name="matricule"
@@ -79,6 +80,21 @@
                                                                         leave
                                                                     </option>
                                                                 </select>
+                                                            </div>
+
+                                                            <div class="row mb-3">
+                                                                <div class="col-md-8">
+                                                                    <label class="form-label">Date to simulate</label>
+                                                                    <input type="date" class="form-control"
+                                                                        name="simulate_date" id="simulate_date"
+                                                                        required>
+                                                                </div>
+                                                                <div class="col-md-4 pt-md-4 row">
+                                                                    <button type="button" class="btn btn-primary mt-2"
+                                                                        id="simulateButton">
+                                                                        Simulate
+                                                                    </button>
+                                                                </div>
                                                             </div>
 
                                                             <!-- Date début -->
@@ -108,9 +124,9 @@
                                                         </div>
 
                                                         <!-- ===== RIGHT: INFOS ===== -->
-                                                        <div class="col-md-6">
+                                                        <div class="col-md-6 row">
 
-                                                            <div class="card mb-3 shadow-sm">
+                                                            <div class="card mb-3 shadow-sm col-md-6">
                                                                 <div class="card-header text-center fw-bold">
                                                                     Actual leave balance
                                                                 </div>
@@ -131,7 +147,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="card mb-3 shadow-sm">
+                                                            <div class="card mb-3 shadow-sm col-md-6">
                                                                 <div class="card-header text-center fw-bold">
                                                                     Simulated leave balance
                                                                 </div>
@@ -171,11 +187,6 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="card-footer">
-                                                    <button type="button" class="btn btn-primary" id="simulateButton">
-                                                        Simulate
-                                                    </button>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>

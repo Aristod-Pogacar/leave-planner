@@ -66,8 +66,6 @@ export class AuthService {
 
         // 👇 Sinon vérification normale en base
         const user = await this.userRepo.findOne({ where: { email } });
-        console.log("USER:", user);
-
 
         if (!user) return null;
 
