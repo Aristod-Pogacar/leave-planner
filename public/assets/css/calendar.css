@@ -16,6 +16,10 @@
             background: #fff;
         }
 
+        .form-select {
+            font-size: small;
+        }
+
         .employee-cell {
             height: 40px;
             display: flex;
