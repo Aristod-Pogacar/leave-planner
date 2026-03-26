@@ -21,10 +21,12 @@
     endDate1.addEventListener('change', checkSimulationLeave);
 
     const soldeCumule1 = document.getElementById('soldeCumule1');
+    const soldeDebut1 = document.getElementById('soldeDebut1');
     const soldePris1 = document.getElementById('soldePris1');
     const soldeRestant1 = document.getElementById('soldeRestant1');
 
     const soldeCumule2 = document.getElementById('soldeCumule2');
+    const soldeDebut2 = document.getElementById('soldeDebut2');
     const soldePris2 = document.getElementById('soldePris2');
     const soldeRestant2 = document.getElementById('soldeRestant2');
 
@@ -60,6 +62,8 @@
                         hiddenInput1.value = emp.id;
                         hiddenInputMatricule1.value = emp.matricule;
                         soldeCumule1.textContent = emp.solde_cumul;
+                        soldeDebut1.textContent = emp.solde_debut;
+                        soldeDebut2.textContent = emp.solde_debut;
                         soldePris1.textContent = emp.solde_pris;
                         soldeRestant1.textContent = emp.solde_restant;
                         solde = emp.solde_restant;

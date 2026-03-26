@@ -157,6 +157,10 @@
                                                                             <span id="section">-</span>
                                                                         </p>
                                                                         <p class="mb-2">
+                                                                            <strong>Starting leave solde :</strong>
+                                                                            <span id="soldeDebut">-</span>
+                                                                        </p>
+                                                                        <p class="mb-2">
                                                                             <strong>Cumulated leave solde :</strong>
                                                                             <span id="soldeCumule">-</span>
                                                                         </p>
@@ -165,7 +169,7 @@
                                                                             <span id="soldePris">-</span>
                                                                         </p>
                                                                         <p class="mb-2">
-                                                                            <strong>Leaves remaining :</strong>
+                                                                            <strong>Leaves left :</strong>
                                                                             <span id="soldeRestant"
                                                                                 class="fw-bold text-primary">-</span>
                                                                         </p>
@@ -245,6 +249,7 @@
         const departement = document.getElementById('departement');
         const section = document.getElementById('section');
         const soldeCumule = document.getElementById('soldeCumule');
+        const soldeDebut = document.getElementById('soldeDebut');
         const soldePris = document.getElementById('soldePris');
         const soldeRestant = document.getElementById('soldeRestant');
         const soldePermission = document.getElementById('soldePermission');
@@ -291,11 +296,12 @@
                                 day: 'numeric'
                             });
                             soldeCumule.textContent = emp.solde_cumul + " day(s)";
+                            soldeDebut.textContent = emp.solde_debut + " day(s)";
                             soldePris.textContent = emp.solde_pris + " day(s)";
                             soldeRestant.textContent = emp.solde_restant + " day(s)";
-                            soldePermission.textContent = emp.permissions + " day(s)";
+                            soldePermission.textContent = emp.solde_pris_permission + " day(s)";
                             solde = emp.solde_restant;
-                            soldePermissionNumber = emp.permissions;
+                            soldePermissionNumber = emp.solde_pris_permission;
                             checkValableLeave();
                             results.innerHTML = '';
                             skip = 0;

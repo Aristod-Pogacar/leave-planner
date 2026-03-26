@@ -3,7 +3,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
 import { Leave } from 'src/leave/entities/leave.entity';
@@ -361,7 +361,7 @@ export class EmployeeService {
 
     for (const column of requiredColumns) {
       if (!headerMap[column]) {
-        throw new Error(`Colonne manquante: ${column}`);
+        throw new Error(`Missing column: ${column}`);
       }
     }
     console.log("HEADER MAP:", headerMap);
@@ -586,21 +586,40 @@ export class EmployeeService {
     }
 
     // 4️⃣ Fusion finale
-    const result = data.map(emp => {
+    const promises = data.map(async (emp) => {
+      const cumulSolde = (await this.getEmployeeSolde(emp.matricule, today)).solde_cumul;
       const pris = takenLeavesMap.get(emp.id) || 0;
-      const permissions = takenPermissionsMap.get(emp.id) || 0;
-      const restant = soldeCumul - pris;
+      const prisPermission = takenPermissionsMap.get(emp.id) || 0;
+      const restant = cumulSolde - pris;
+
+      const doeDate = new Date(emp.DOE);
+
+      let soldeDebut = 0;
+      if (year > doeDate.getFullYear() + 1) {
+        const dateDebutCompte = new Date(doeDate.getFullYear() + 1, doeDate.getMonth(), doeDate.getDate());
+        for (let i = dateDebutCompte.getFullYear(); i <= year; i += 3) {
+          if (year - i < 3) {
+            for (let y = i; y < year; y++) {
+              soldeDebut += (await this.getEmployeeSolde(emp.matricule, new Date(y, 11, 31))).solde_restant;
+            }
+          }
+        }
+      }
 
       return {
         ...emp,
-        solde_cumul: Number(soldeCumul.toFixed(2)),
+        solde_cumul: Number(cumulSolde.toFixed(2)),
+        solde_debut: Number(soldeDebut.toFixed(2)),
         solde_pris: Number(pris.toFixed(2)),
-        solde_restant: Number(restant.toFixed(2)),
-        permissions: Number(permissions.toFixed(2)),
+        solde_pris_permission: Number(prisPermission.toFixed(2)),
+        solde_restant: Number((restant + soldeDebut).toFixed(2)),
       };
     });
 
-    return result;
+    // 2. Attends que TOUTES les promesses soient résolues
+    const results = await Promise.all(promises);
+
+    return results;
   }
 
   async findOneByMatricule(matricule: string) {

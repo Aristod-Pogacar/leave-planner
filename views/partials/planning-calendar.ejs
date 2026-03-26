@@ -29,7 +29,9 @@
     let leaves = [];
 
     const year = 2026;
-    let currentStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    // let currentStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    let currentStartDate = new Date();
+    currentStartDate.setDate(currentStartDate.getDate() - 15);
     let currentEndDate = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0);
     const startMonth = new Date().getMonth() + 1;
     const endMonth = startMonth + 2;
@@ -100,7 +102,7 @@
         employeeColumn.innerHTML += `
   <div class="employee-row header-row">
     <div class="header-cell">EMPLOYEES</div>
-    <div class="header-cell">DEBUT</div>
+    <div class="header-cell">START</div>
     <div class="header-cell">CUMUL</div>
     <div class="header-cell">TAKEN</div>
     <div class="header-cell">LEFT</div>
@@ -153,8 +155,12 @@
                 cell.dataset.date = isoDate;
             }
 
+            if (day.getDay() === 6) {
+                cell.classList.add("day-off-saturday");
+            }
+
             if (day.getDay() === 0) {
-                cell.classList.add("day-off");
+                cell.classList.add("day-off-sunday");
             }
 
             const month = day.toLocaleString("default", { month: "short" });
@@ -252,8 +258,12 @@
                         cell.classList.add("today");
                     }
 
+                    if (day.getDay() === 6) {
+                        cell.classList.add("day-off-saturday");
+                    }
+
                     if (day.getDay() === 0) {
-                        cell.classList.add("day-off");
+                        cell.classList.add("day-off-sunday");
                     }
                 });
 

@@ -119,8 +119,8 @@ export class EmployeeController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
   @Render('import-master-file')
-  async importMasterFile() {
-    return { title: "Import Master File" };
+  async importMasterFile(@Req() req: any) {
+    return { title: "Import Master File", error: req.query.error };
   }
 
   @Post('import-master-file')
@@ -145,8 +145,8 @@ export class EmployeeController {
       res.redirect(`/leave/planning-view`);
     } catch (error) {
       // Gestion d'erreur
-      console.log("ERROR:", error)
-      res.redirect(`/employee?error=${encodeURIComponent(error.message)}`);
+      console.log("ERROR:", error.message)
+      res.redirect(`/employee/import-master-file?error=${encodeURIComponent(error.message)}`);
     }
   }
 

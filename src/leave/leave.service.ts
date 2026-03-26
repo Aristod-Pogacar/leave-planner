@@ -7,6 +7,7 @@ import { Between, Repository } from 'typeorm';
 import { Employee } from 'src/employee/entities/employee.entity';
 import * as express from 'express';
 import * as ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
 
 @Injectable()
 export class LeaveService {
@@ -57,6 +58,89 @@ export class LeaveService {
     return res.status(200).redirect('/leave/planning-view?line=' + employee.line + '&departement=' + employee.departement);
   }
 
+  async importLeaves(file: Express.Multer.File) {
+    try {
+      console.log("LEAVE SERVICE IMPORT LEAVES");
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(file.buffer as any);
+      // await workbook.xlsx.readFile(file.path);await workbook.xlsx.load(file.buffer as any);
+
+      console.log("GETTING WORKSHEET");
+      const worksheet = workbook.getWorksheet("donne saisie");
+      console.log("WORKSHEET:", worksheet?.name);
+
+      if (!worksheet) {
+        const message = 'Aucune feuille trouvée dans le fichier Excel'
+        console.log(message)
+        throw new Error(message);
+      }
+      console.log("GETTING HEADER ROW");
+      const headerRow = worksheet.getRow(1);
+      console.log("HEADER ROW:", headerRow.values);
+
+      const headerMap: Record<string, number> = {};
+
+      headerRow.eachCell((cell, colNumber) => {
+        const headerName = cell.value?.toString().trim().toLowerCase();
+        console.log("COLUMN NAME:", headerName);
+        if (headerName) {
+          headerMap[headerName] = colNumber;
+        }
+      });
+
+
+      // 2️⃣ Vérifier que les colonnes obligatoires existent
+      const requiredColumns = ['mle', 'nom et prenom', 'fonction', 'codeabs', 'debutcongé', 'fincongé'];
+
+      for (const column of requiredColumns) {
+        if (!headerMap[column]) {
+          throw new Error(`Missing column: ${column}`);
+        }
+      }
+      console.log("HEADER MAP:", headerMap);
+      const leaves: Partial<Leave>[] = [];
+
+      for (let i = 2; i <= worksheet.rowCount; i++) {
+        const row = worksheet.getRow(i);
+        const employee = await this.employeeRepository.findOne({ where: { matricule: row.getCell(headerMap['mle']).value?.toString() } });
+        let leave_type = row.getCell(headerMap['codeabs']).value?.toString();
+        if (leave_type === "Congé annuel") {
+          leave_type = "Local_Leave_AMD";
+        } else if (leave_type === "Permission") {
+          leave_type = "Permission_AMD";
+        } else if (leave_type === "Disponibilité") {
+          leave_type = "Indisponibilite_AMD";
+        }
+        if (!employee) {
+          console.log("EMPLOYEE NOT FOUND:", row.getCell(headerMap['mle']).value?.toString());
+          continue;
+        }
+        const startDate = row.getCell(headerMap['debutcongé']).value as Date;
+        const endDate = row.getCell(headerMap['fincongé']).value as Date;
+        const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
+        leaves.push({
+          employee: employee,
+          leave_type: leave_type,
+          start_date: startDate,
+          end_date: endDate,
+          duration: duration,
+        });
+      }
+
+      await this.leaveRepository.save(leaves);
+      return {
+        result: 'success',
+        message: 'File readed successfully',
+      };
+    } catch (error) {
+      console.log("ERROR:", error);
+      return {
+        result: 'error',
+        message: error.message,
+      };
+    }
+  }
+
   async getEmployeeCumulativeBalance(employeeId: string = "", date: Date) {
     if (!employeeId) {
       return null;
@@ -71,7 +155,7 @@ export class LeaveService {
         { id: employeeId },
       )
       // .andWhere('u.id IS NULL')
-      .select(['e.id', 'e.matricule', 'e.fullname'])
+      .select(['e.id', 'e.matricule', 'e.fullname', 'e.DOE'])
       .take(10)
       .getManyAndCount();
 
@@ -88,6 +172,7 @@ export class LeaveService {
       .where('employee.id IN (:...employeeIds)', { employeeIds: [employeeId] })
       .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
       .andWhere('YEAR(leave.start_date) = :year', { year: date.getFullYear() })
+      .andWhere('leave.start_date <= :date', { date: date.toISOString() })
       .groupBy('employee.id')
       .getRawMany();
     console.log("Data:", takenLeaves);
@@ -104,21 +189,127 @@ export class LeaveService {
     // 3️⃣ Calcul solde cumulatif dynamique
     // const today = new Date();
 
-    let soldeCumul = this.calculateCumulBalance(date);
+    // let soldeCumul = this.calculateCumulBalance(date);
 
     // 4️⃣ Fusion finale
-    const result = data.map(emp => {
+    // const result = data.map(emp => {
+    //   const pris = takenMap.get(emp.id) || 0;
+    //   const restant = soldeCumul - pris;
+
+    //   return {
+    //     ...emp,
+    //     solde_cumul: Number(soldeCumul.toFixed(2)),
+    //     solde_pris: Number(pris.toFixed(2)),
+    //     solde_restant: Number(restant.toFixed(2)),
+    //   };
+    // });
+    const promises = data.map(async (emp) => {
+      const cumulSolde = (await this.getEmployeeSolde(emp.matricule, date)).solde_cumul;
       const pris = takenMap.get(emp.id) || 0;
-      const restant = soldeCumul - pris;
+      const restant = cumulSolde - pris;
+
+      const doeDate = new Date(emp.DOE);
+
+
+      let soldeDebut = 0;
+      if (date.getFullYear() > doeDate.getFullYear() + 1) {
+        const dateDebutCompte = new Date(doeDate.getFullYear() + 1, doeDate.getMonth(), doeDate.getDate());
+        for (let i = dateDebutCompte.getFullYear(); i <= date.getFullYear(); i += 3) {
+          if (date.getFullYear() - i < 3) {
+            for (let y = i; y < date.getFullYear(); y++) {
+              soldeDebut += (await this.getEmployeeSolde(emp.matricule, new Date(y, 11, 31))).solde_restant;
+            }
+          }
+        }
+      }
 
       return {
         ...emp,
-        solde_cumul: Number(soldeCumul.toFixed(2)),
+        solde_cumul: Number(cumulSolde.toFixed(2)),
+        solde_debut: Number(soldeDebut.toFixed(2)),
         solde_pris: Number(pris.toFixed(2)),
-        solde_restant: Number(restant.toFixed(2)),
+        solde_restant: Number((restant + soldeDebut).toFixed(2)),
       };
     });
-    return result[0];
+    const results = await Promise.all(promises);
+    console.log("Results:", results[0]);
+
+    return results[0];
+  }
+
+  async getEmployeeSolde(matricule: string, at: Date) {
+    const year = at.getFullYear();
+    const employee = await this.employeeRepository.findOne({ where: { matricule } });
+    if (!employee) return { solde_cumul: 0, solde_pris: 0, solde_restant: 0 };
+
+    const takenLeaves = await this.leaveRepository
+      .createQueryBuilder('leave')
+      .leftJoin('leave.employee', 'employee')
+      .select('employee.id', 'employeeId')
+      .addSelect(
+        'SUM(DATEDIFF(leave.end_date, leave.start_date) + 1)',
+        'daysTaken'
+      )
+      .where('employee.id = :employeeId', { employeeId: employee.id })
+      .andWhere('leave.leave_type = :type', { type: 'Local_Leave_AMD' })
+      .andWhere('YEAR(leave.start_date) = :year', { year })
+      .andWhere('leave.start_date <= :at', { at })
+      .groupBy('employee.id')
+      .getRawMany();
+
+
+    const takenLeavesMap = new Map<string, number>();
+
+    takenLeaves.forEach(l => {
+      takenLeavesMap.set(l.employeeId, Number(l.daysTaken));
+    });
+    // 3️⃣ Calcul solde cumulatif dynamique
+    let soldeCumul = 0;
+
+    const getCumul = (date: Date) => {
+      let cumul = 0;
+      for (let m = 0; m <= date.getMonth(); m++) {
+        const daysInMonth = new Date(date.getFullYear(), m + 1, 0).getDate();
+
+        if (m === date.getMonth()) {
+          cumul += (2.5 / daysInMonth) * date.getDate();
+        } else {
+          cumul += 2.5;
+        }
+      }
+      return cumul;
+    }
+
+    if (year < at.getFullYear()) {
+      // année passée → solde plein
+      soldeCumul = 2.5 * 12;
+    } else if (year > at.getFullYear()) {
+      // année future → rien
+      soldeCumul = 0;
+    } else {
+      // année en cours → calcul journalier
+      soldeCumul = getCumul(at);
+    }
+
+    const yearAfterDOE = new Date(employee.DOE);
+    yearAfterDOE.setFullYear(yearAfterDOE.getFullYear() + 1);
+    if (at.getFullYear() === yearAfterDOE.getFullYear()) {
+      soldeCumul = soldeCumul - getCumul(yearAfterDOE);
+    } else if (at.getFullYear() <= yearAfterDOE.getFullYear()) {
+      soldeCumul = 0;
+    }
+
+    const pris = takenLeavesMap.get(employee.id) || 0;
+    const restant = soldeCumul - pris;
+
+    const result = {
+      ...employee,
+      solde_cumul: Number(soldeCumul.toFixed(2)),
+      solde_pris: Number(pris.toFixed(2)),
+      solde_restant: Number(restant.toFixed(2)),
+    };
+
+    return result;
   }
 
   calculateCumulBalance(date: Date) {

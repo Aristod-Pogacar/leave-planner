@@ -72,9 +72,15 @@
                                             <a href="auth-reset-creative.html" class="fs-11 text-primary">Forget password?</a>
                                         </div>
                                     </div> -->
-                                    <div class="mt-5">
-                                        <button type="submit" class="btn btn-lg btn-primary w-100">Login</button>
-                                    </div>
+                                    <% if (locals.error) { %>
+                                        <div class="alert alert-danger" role="alert" id="message">
+                                            <%= error %>
+                                        </div>
+                                        <% } %>
+                                            <div class="mt-5">
+                                                <button type="submit"
+                                                    class="btn btn-lg btn-primary w-100">Login</button>
+                                            </div>
                                 </form>
                             </div>
                         </div>

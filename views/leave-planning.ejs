@@ -56,22 +56,6 @@
                                                             class="col-10 task-header d-md-flex align-items-center justify-content-between">
                                                             <div class="me-4 w-75">
                                                                 <div class="d-flex align-items-center">
-                                                                    <label for="lineFilter"
-                                                                        class="form-label ms-3">Line:</label>
-                                                                    <select class="form-select mx-3" name="lineFilter"
-                                                                        id="lineFilter">
-                                                                        <% lineList.forEach(line=> { %>
-                                                                            <% if (line==='NULL' ) { %>
-                                                                                <option value="<%= line %>" selected>
-                                                                                    <%= line %>
-                                                                                </option>
-                                                                                <% } else { %>
-                                                                                    <option value="<%= line %>">
-                                                                                        <%= line %>
-                                                                                    </option>
-                                                                                    <% } %>
-                                                                                        <% }) %>
-                                                                    </select>
                                                                     <label for="departementFilter"
                                                                         class="form-label ms-3">Departement:</label>
                                                                     <select class="form-select mx-3"
@@ -89,6 +73,22 @@
                                                                                     </option>
                                                                                     <% } %>
                                                                                         <% }); %>
+                                                                    </select>
+                                                                    <label for="lineFilter"
+                                                                        class="form-label ms-3">Line:</label>
+                                                                    <select class="form-select mx-3" name="lineFilter"
+                                                                        id="lineFilter">
+                                                                        <% lineList.forEach(line=> { %>
+                                                                            <% if (line==='NULL' ) { %>
+                                                                                <option value="<%= line %>" selected>
+                                                                                    <%= line %>
+                                                                                </option>
+                                                                                <% } else { %>
+                                                                                    <option value="<%= line %>">
+                                                                                        <%= line %>
+                                                                                    </option>
+                                                                                    <% } %>
+                                                                                        <% }) %>
                                                                     </select>
                                                                     <label for="siteFilter"
                                                                         class="form-label ms-3">Site:</label>
@@ -117,7 +117,7 @@
                                                                 <div class="d-flex gap-2">
                                                                     <% if(user.role !=="USER" ) { %>
                                                                         <a href="/leave/new-leave"
-                                                                            class="btn btn-success" title="New leave">
+                                                                            class="btn btn-primary" title="New leave">
                                                                             <i class="feather-plus me-2"></i>
                                                                             <span>New Leave</span>
                                                                         </a>

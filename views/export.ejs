@@ -64,25 +64,6 @@
                                                                     <div class="">
                                                                         <div class="row">
                                                                             <div class="col-md-6 mb-3">
-                                                                                <label class="form-label">Line</label>
-                                                                                <select class="form-select" name="line"
-                                                                                    id="lineFilter">
-                                                                                    <% lineList.forEach(line=> { %>
-                                                                                        <% if (line==='NULL' ) { %>
-                                                                                            <option value="<%= line %>"
-                                                                                                selected>
-                                                                                                <%= line %>
-                                                                                            </option>
-                                                                                            <% } else { %>
-                                                                                                <option
-                                                                                                    value="<%= line %>">
-                                                                                                    <%= line %>
-                                                                                                </option>
-                                                                                                <% } %>
-                                                                                                    <% }) %>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-md-6 mb-3">
                                                                                 <label
                                                                                     class="form-label">Departement</label>
                                                                                 <select class="form-select"
@@ -103,6 +84,25 @@
                                                                                                 </option>
                                                                                                 <% } %>
                                                                                                     <% }); %>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-md-6 mb-3">
+                                                                                <label class="form-label">Line</label>
+                                                                                <select class="form-select" name="line"
+                                                                                    id="lineFilter">
+                                                                                    <% lineList.forEach(line=> { %>
+                                                                                        <% if (line==='NULL' ) { %>
+                                                                                            <option value="<%= line %>"
+                                                                                                selected>
+                                                                                                <%= line %>
+                                                                                            </option>
+                                                                                            <% } else { %>
+                                                                                                <option
+                                                                                                    value="<%= line %>">
+                                                                                                    <%= line %>
+                                                                                                </option>
+                                                                                                <% } %>
+                                                                                                    <% }) %>
                                                                                 </select>
                                                                             </div>
                                                                         </div>

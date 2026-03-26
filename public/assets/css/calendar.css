@@ -98,9 +98,13 @@
             background-color: #eefbff;
         }
 
-        .day-off {
+        .day-off-sunday {
             background-color: #9d9d9d;
             color: #ffffff;
+        }
+
+        .day-off-saturday {
+            background-color: #d5d5d5;
         }
 
         .leave-Local_Leave_AMD {

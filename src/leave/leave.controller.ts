@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Render, Res, Query, UseGuards, ParseIntPipe, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
@@ -8,6 +8,8 @@ import { SuperAdminGuard } from 'src/superadmin/superadmin.guard';
 import { RolesGuard } from 'src/user/role.guard';
 import { Roles } from 'src/user/role.decorator';
 import { UserRole, Site } from 'src/user/entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Controller('leave')
 export class LeaveController {
@@ -138,6 +140,35 @@ export class LeaveController {
   async getEmployeeCumulativeBalance(@Body('matricule') matricule: string, @Body('date') date: string) {
     const employee = await this.employeeService.findOneByMatricule(matricule);
     return this.leaveService.getEmployeeCumulativeBalance(employee?.id, new Date(date));
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
+  @Get('import-leaves')
+  @Render('import-leaves')
+  async importLeavesView(@Req() req: any) {
+    return { title: "Import Leaves", error: req.query.error };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.PAYROLL)
+  @Post('import-leaves')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+    }),
+  )
+  async importLeavesPost(@UploadedFile() file: Express.Multer.File, @Res() res: express.Response) {
+    try {
+      console.log("FILE:", file);
+      const result = await this.leaveService.importLeaves(file);
+      if (result.result === 'error') {
+        return res.redirect(`/leave/import-leaves?error=${result.message}`);
+      }
+      return res.redirect(`/leave/planning-view`);
+    } catch (error) {
+      return res.redirect(`/leave/import-leaves?error=${error.message}`);
+    }
   }
 
   @UseGuards(RolesGuard)
